@@ -7,7 +7,11 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
-
+typedef struct  s_env{
+    char * name ;
+    char *value;
+    struct s_env *next;    
+} t_env ;
 char *space(char *input) 
 {
     int i = 0;
@@ -116,8 +120,51 @@ char *inpute(char *input)
     }
     return input;
 }
-int main()
+
+void print_env(t_env *env)
 {
+    while(env)
+    {
+        printf("name == %s\n",env->name);
+        printf("9ima == %s\n",env->value);
+        env = env->next;
+    }
+}
+t_env   *cnv_env(char **env)
+{
+    if(!*env)
+        return NULL;
+    int i = 0;
+    int j = 0;
+    int k = 0;
+    t_env *cnv = malloc(sizeof(t_env));
+    
+    while (env[i])
+    {
+        while(env[i][j])
+        {
+            if(env[i][j] == '=')
+            {
+                cnv->name = substr(env[i] ,0,j - 1);
+                cnv->value = substr(env[i] , j+1 , strlen(env[i]));
+                    cnv->next = NULL ;
+                    print_env(cnv);
+                    exit(0);
+            }
+            j++;
+        }        
+          
+        i++;
+    }
+    
+    return cnv;
+}
+int main(int ac , char **av , char **env)
+{
+    (void)ac;
+    (void)av;
     char * input;
+    t_env * anv = cnv_env(env);
+    print_env(anv);
      printf("sss%s\n",inpute(input));
 }
