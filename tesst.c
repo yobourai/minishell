@@ -4,6 +4,40 @@
 #include <readline/history.h>
 #include <string.h>
 #include <unistd.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
+
+char *space(char *input) 
+{
+    int i = 0;
+    int  j = 0;
+    char *tmp = malloc(strlen(input) + 1);
+
+    if (!tmp)
+        return NULL;
+
+    while (input[i] == ' ' || input[i] == '\t')
+                i++;
+    while (input[i]) 
+    {
+        if (input[i] == ' ' || input[i] == '\t')
+        {
+            if (j > 0 && tmp[j - 1] != ' ')
+                tmp[j++] = ' ';
+        } 
+        else
+            tmp[j++] = input[i];
+        i++;
+    }
+
+    if (j > 0 && tmp[j - 1] == ' ')
+            j--;
+
+    tmp[j] = '\0';
+    return tmp;
+}
+
 char *handle_quotes(char *ptr)
 {
     int i = 0;
@@ -13,6 +47,7 @@ char *handle_quotes(char *ptr)
     int j = 0;
     int z = 0;
     int m = 0;
+    ptr = space(ptr);
     char *tmp = malloc(strlen(ptr) + 1);
     if (!tmp)
     {
