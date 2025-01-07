@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include "./libft/libft.h"
 typedef struct  s_env{
     char * name ;
     char *value;
@@ -125,10 +126,23 @@ void print_env(t_env *env)
 {
     while(env)
     {
-        printf("name == %s\n",env->name);
-        printf("9ima == %s\n",env->value);
+        printf("name == '%s'\n",env->name);
+        printf("9ima == '%s'\n",env->value);
         env = env->next;
     }
+}
+void free_env(t_env * env)
+{
+    t_env * curent = NULL;
+    while (env)
+    {
+        curent = env->next;
+        free(env->name);
+        free(env->value);
+        free(env);
+        env = curent ;
+    }
+    
 }
 t_env   *cnv_env(char **env)
 {
@@ -137,27 +151,48 @@ t_env   *cnv_env(char **env)
     int i = 0;
     int j = 0;
     int k = 0;
-    t_env *cnv = malloc(sizeof(t_env));
-    
+    t_env * head = NULL;
+    t_env * curent = NULL;
+
     while (env[i])
     {
+        j = 0 ;
         while(env[i][j])
         {
             if(env[i][j] == '=')
             {
-                cnv->name = substr(env[i] ,0,j - 1);
-                cnv->value = substr(env[i] , j+1 , strlen(env[i]));
-                    cnv->next = NULL ;
-                    print_env(cnv);
-                    exit(0);
+                t_env *cnv = malloc(sizeof(t_env));
+                cnv->name = ft_substr(env[i] ,0,j);
+                cnv->value = ft_substr(env[i] , j+1 , strlen(env[i]));
+                cnv->next = NULL ;
+                if(!head)
+                    head = cnv ;
+                else
+                    curent->next = cnv;
+
+                curent = cnv;
+                    break;
             }
             j++;
         }        
-          
         i++;
     }
     
-    return cnv;
+    return head ;
+}
+char *get_value(t_env * env , char *value)
+{
+    if(!value)
+        return NULL;
+    while(env)
+    {
+        if(strcmp(env->name , value) == 0)
+        {
+            return env->value;
+        }
+        env = env->next;
+    }
+    return NULL;
 }
 int main(int ac , char **av , char **env)
 {
@@ -165,6 +200,7 @@ int main(int ac , char **av , char **env)
     (void)av;
     char * input;
     t_env * anv = cnv_env(env);
-    print_env(anv);
-     printf("sss%s\n",inpute(input));
+    // print_env(anv);
+     input = get_value(anv,NULL );
+     printf("jbdsygifhoinoihx<dbif>>>>>>>>>%s\n",input);
 }
