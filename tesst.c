@@ -58,18 +58,21 @@ char *handle_quotes(char *ptr)
     {
         exit(1);
     }
-
     while (ptr[i])
     {
         if(ptr[i] == '\'' && j != 2)
         {
             j = 1;
             z++;
+            if(z % 2 == 0)
+                j = 0;
         }
        else if(ptr[i] == '"' && j != 1)
        {
             j=2;
             m++;
+            if(m % 2 == 0)
+                j = 0;
        }
         if (ptr[i] == '\'' && !in_double_quote)
         {
@@ -100,28 +103,6 @@ char *handle_quotes(char *ptr)
     tmp[k] = '\0'; 
     return tmp;
 }
-
-char *inpute(char *input)
-{
-    int i = 0;
-    char *str ;
-        char *tmp;
-    while (1) 
-    {
-        input = readline("minishell : ");
-        printf("%s\n",input);
-       input = handle_quotes(input);
-        printf("%s\n",input);
-        if (input == NULL)
-        {
-            printf("\nExiting...\n");
-            break;
-        }
-        free(input);
-    }
-    return input;
-}
-
 void print_env(t_env *env)
 {
     while(env)
@@ -163,7 +144,7 @@ t_env   *cnv_env(char **env)
             {
                 t_env *cnv = malloc(sizeof(t_env));
                 cnv->name = ft_substr(env[i] ,0,j);
-                cnv->value = ft_substr(env[i] , j+1 , strlen(env[i]));
+                cnv->value = ft_substr(env[i] , j+1 , ft_strlen(env[i]));
                 cnv->next = NULL ;
                 if(!head)
                     head = cnv ;
@@ -194,13 +175,106 @@ char *get_value(t_env * env , char *value)
     }
     return NULL;
 }
+int is_valid_var_char(char c)
+{
+    return ((c >= 'a' && c <= 'z') || 
+            (c >= 'A' && c <= 'Z') ||  
+            c == '_');
+}
+
+char *dollar_sign(char *input, t_env *env)
+{
+    int i = 0;
+    int  j = 0;
+    int  k = 0;
+    char *tmp = malloc(strlen(input) * 5000 + 1);
+    if(!tmp)
+        return NULL;
+    char *ptr = malloc(ft_strlen(input) + 1);
+    if (!ptr)
+    {
+        free(tmp);
+        return NULL;
+    }
+    int z = 0;
+    while (input[i])
+    {
+      while (input[i] && !(input[i] == '$' && (i == 0 || input[i - 1] != '\'')))
+        {
+            if(input[i] == '\'' )
+                z++;
+            tmp[k++] = input[i++];
+        }
+
+        if (input[i] == '$')
+        {
+            i++; 
+            j = 0;
+
+            while (input[i] && is_valid_var_char(input[i]) && z % 2 == 0)
+            {
+                ptr[j++] = input[i++];
+            }
+            ptr[j] = '\0';
+
+            char *value = get_value(env, ptr);
+            if (value)
+            {
+                while (*value)
+                {
+                    tmp[k++] = *value++;
+                }
+            }
+            else
+            {
+                int m = 0;
+                tmp[k++] = '$';
+                while( m < j)
+                    tmp[k++] = ptr[m++];
+            }
+        }
+    }
+
+    tmp[k] = '\0';
+    free(ptr);
+    return tmp;
+}
+
+
+char *inpute(char *input , t_env *env)
+{
+    int i = 0;
+    char *str ;
+        char *tmp;
+    while (1) 
+    {
+        input = readline("minishell : ");
+        printf("%s\n",input);
+        input = dollar_sign(input , env);
+       input = handle_quotes(input);
+        printf("%s\n",input);
+        if (input == NULL)
+        {
+            printf("\nExiting...\n");
+            break;
+        }
+        add_history(input);
+        free(input);
+    }
+    return input;
+}
+
 int main(int ac , char **av , char **env)
 {
     (void)ac;
     (void)av;
-    char * input;
+    char * input ;
     t_env * anv = cnv_env(env);
-    // print_env(anv);
-     input = get_value(anv,NULL );
-     printf("jbdsygifhoinoihx<dbif>>>>>>>>>%s\n",input);
+    // // print_env(anv);
+    input = inpute(input , anv);
+    // char *value = dollar_sign(input , anv);
+    //  input = get_value(anv,NULL );
+    // input = inpute(input , anv);
+    // input = dollar_sign(input , anv);
+     printf("%s\n",input);
 }
