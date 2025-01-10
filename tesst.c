@@ -13,6 +13,7 @@ typedef struct  s_env{
     char *value;
     struct s_env *next;    
 } t_env ;
+
 char *space(char *input) 
 {
     int i = 0;
@@ -69,6 +70,7 @@ char *handle_quotes(char *ptr)
         }
        else if(ptr[i] == '"' && j != 1)
        {
+
             j=2;
             m++;
             if(m % 2 == 0)
@@ -131,7 +133,7 @@ t_env   *cnv_env(char **env)
         return NULL;
     int i = 0;
     int j = 0;
-    int k = 0;
+    int k = 0; 
     t_env * head = NULL;
     t_env * curent = NULL;
 
@@ -178,61 +180,121 @@ char *get_value(t_env * env , char *value)
 int is_valid_var_char(char c)
 {
     return ((c >= 'a' && c <= 'z') || 
-            (c >= 'A' && c <= 'Z') ||  
+            (c >= 'A' && c <= 'Z') ||
+            (c >= '0' && c <= '9') || 
             c == '_');
 }
-
+int  check_singel(char *input)
+{
+    int i = 0;
+    int j = 0;
+    while (input[i] && input[i] != '$')
+    {
+        if (input[i] == '\'')
+            j++;
+        i++;
+    }
+    if (j % 2 != 0)
+        return 1;
+    return 0;
+}
+int check_double(char *input)
+{
+    int i = 0;
+    int j = 0;
+    while (input[i] && input[i] != '$')
+    {
+        if (input[i] == '"')
+            j++;
+        i++;
+    }
+    if (j % 2 == 0)
+        return 1;
+    return 0;
+}
 char *dollar_sign(char *input, t_env *env)
 {
     int i = 0;
     int  j = 0;
     int  k = 0;
-    char *tmp = malloc(strlen(input) * 5000 + 1);
+    char *tmp = malloc(strlen(input) * 500 + 1);
     if(!tmp)
         return NULL;
-    char *ptr = malloc(ft_strlen(input) + 1);
+    char *ptr = malloc(ft_strlen(input) * 10 + 1);
     if (!ptr)
     {
         free(tmp);
         return NULL;
     }
     int z = 0;
+    int p = 0 ;
+    int   b = -1;
+    int g = 0;
+    int h = -1;
     while (input[i])
     {
-      while (input[i] && !(input[i] == '$' && (i == 0 || input[i - 1] != '\'')))
+      while (input[i] && input[i] != '$')
         {
-            if(input[i] == '\'' )
-                z++;
-            tmp[k++] = input[i++];
-        }
-
-        if (input[i] == '$')
-        {
-            i++; 
-            j = 0;
-
-            while (input[i] && is_valid_var_char(input[i]) && z % 2 == 0)
+            if(input[i]== '"')
             {
-                ptr[j++] = input[i++];
+                p++;
+                if(h == -1)
+                    h = i;
+             
             }
-            ptr[j] = '\0';
-
-            char *value = get_value(env, ptr);
-            if (value)
+            if(input[i] == '\'' )
             {
-                while (*value)
+                    z++;
+                if(b == -1 || input[i-1] == '"')
+                    b = i;
+                if(z % 2 == 0)
                 {
-                    tmp[k++] = *value++;
+                        z = 0;
+                        
                 }
             }
-            else
-            {
-                int m = 0;
-                tmp[k++] = '$';
-                while( m < j)
-                    tmp[k++] = ptr[m++];
-            }
+            tmp[k++] = input[i++];
         }
+        printf("p == %d\n",p);
+        printf("b == %d\n",b);
+        printf("h == %d\n",h);
+        printf("z == %d\n",z);
+
+        g = i;
+        if (input[i] == '$' && (b == -1 || ( p % 2 == 1 && h <= b)) )
+          {
+                i++; 
+                j = 0;
+                p = 0;
+                z = 0;
+
+                while (input[i] && (is_valid_var_char(input[i])) && input[i] != ' ')
+                {
+                 ptr[j++] = input[i++];
+                }   
+                ptr[j] = '\0';
+                char *value = get_value(env, ptr);
+                if (value)
+                {
+                    int o = 0;
+                    while (value[o])
+                    {
+                         tmp[k++] = value[o++];
+                    }
+                }
+                else
+                {
+                    int m = 0;
+                    tmp[k++] = '$';
+                    while( m < j)
+                    {
+                            tmp[k++] = ptr[m++];
+
+                    }
+                }
+         }
+        if(g == i)
+            i++;
     }
 
     tmp[k] = '\0';
@@ -263,7 +325,36 @@ char *inpute(char *input , t_env *env)
     }
     return input;
 }
-
+char *redairectionc_error(char *input)
+{
+    int i = 0;
+    int j = 0;
+    int k = 0;
+    char *tmp = malloc(strlen(input) + 1);
+    if (!tmp)
+        return NULL;
+    while (input[i])
+    {
+        if (input[i] == '>' && input[i + 1] == '>')
+        {
+            tmp[k++] = ' ';
+            tmp[k++] = '>';
+            tmp[k++] = '>';
+            tmp[k++] = ' ';
+            i += 2;
+        }
+        else if (input[i] == '>' || input[i] == '<')
+        {
+            tmp[k++] = ' ';
+            tmp[k++] = input[i++];
+            tmp[k++] = ' ';
+        }
+        else
+            tmp[k++] = input[i++];
+    }
+    tmp[k] = '\0';
+    return tmp;
+}
 int main(int ac , char **av , char **env)
 {
     (void)ac;
