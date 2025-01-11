@@ -248,6 +248,37 @@ char *dollar_sign(char *input, t_env *env)
     return tmp;
 }
 
+int redairectionc_error(char *input)
+{
+    int i = 0;
+    while (input[i] == ' ' || input[i] == '\t')
+        i++;
+    if(input[i] == '|')
+    {
+        printf("syntax error near unexpected token \n");
+        return 1;
+    }
+    while(input[i])
+    {
+       
+        if( input[i] == '&'||(input[i] == '|' && input[i+1] == '|' ) || (input[i] == '&'  && input[i+1] == '&'))
+        {
+            printf("syntax error near unexpected token \n");
+            return 1;
+        }
+        i++;
+    }
+    if(input[i] == '\0')
+            i--;
+    while(0 <= i && (input[i] == ' ' || input[i] == '\t'))
+            i--;
+    if(input[i] == '|' || input[i] == '>' || input[i] == '<' || ( input[i] == '>' && input[i+1] == '>') || (input[i] == '<' && input[i-1] == '<') || (input[i] == '>' && input[i-1] == '>'))
+    {
+        printf("syntax error near unexpected token \n");
+        return 1;
+    }
+    return 0;
+}
 
 char *inpute(char *input , t_env *env)
 {
@@ -260,6 +291,8 @@ char *inpute(char *input , t_env *env)
         printf("%s\n",input);
         input = dollar_sign(input , env);
        input = handle_quotes(input);
+       if(redairectionc_error(input) == 1)
+            break;
         printf("%s\n",input);
         if (input == NULL)
         {
@@ -270,36 +303,6 @@ char *inpute(char *input , t_env *env)
         free(input);
     }
     return input;
-}
-char *redairectionc_error(char *input)
-{
-    int i = 0;
-    int j = 0;
-    int k = 0;
-    char *tmp = malloc(strlen(input) + 1);
-    if (!tmp)
-        return NULL;
-    while (input[i])
-    {
-        if (input[i] == '>' && input[i + 1] == '>')
-        {
-            tmp[k++] = ' ';
-            tmp[k++] = '>';
-            tmp[k++] = '>';
-            tmp[k++] = ' ';
-            i += 2;
-        }
-        else if (input[i] == '>' || input[i] == '<')
-        {
-            tmp[k++] = ' ';
-            tmp[k++] = input[i++];
-            tmp[k++] = ' ';
-        }
-        else
-            tmp[k++] = input[i++];
-    }
-    tmp[k] = '\0';
-    return tmp;
 }
 int main(int ac , char **av , char **env)
 {
