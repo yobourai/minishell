@@ -177,6 +177,7 @@ char *get_value(t_env * env , char *value)
     }
     return NULL;
 }
+
 int is_valid_var_char(char c)
 {
     return ((c >= 'a' && c <= 'z') || 
@@ -184,117 +185,62 @@ int is_valid_var_char(char c)
             (c >= '0' && c <= '9') || 
             c == '_');
 }
-int  check_singel(char *input)
-{
-    int i = 0;
-    int j = 0;
-    while (input[i] && input[i] != '$')
-    {
-        if (input[i] == '\'')
-            j++;
-        i++;
-    }
-    if (j % 2 != 0)
-        return 1;
-    return 0;
-}
-int check_double(char *input)
-{
-    int i = 0;
-    int j = 0;
-    while (input[i] && input[i] != '$')
-    {
-        if (input[i] == '"')
-            j++;
-        i++;
-    }
-    if (j % 2 == 0)
-        return 1;
-    return 0;
-}
+
 char *dollar_sign(char *input, t_env *env)
 {
     int i = 0;
-    int  j = 0;
     int  k = 0;
-    char *tmp = malloc(strlen(input) * 500 + 1);
-    if(!tmp)
+    int in_single_quote = 0;
+    int in_double_quote = 0;
+    if(!input)
         return NULL;
-    char *ptr = malloc(ft_strlen(input) * 10 + 1);
+    char *tmp = malloc(strlen(input) * 500 + 1);
+    if (!tmp)
+        return NULL;
+
+    char *ptr = malloc(strlen(input) * 10 + 1);
     if (!ptr)
     {
         free(tmp);
         return NULL;
     }
-    int z = 0;
-    int p = 0 ;
-    int   b = -1;
-    int g = 0;
-    int h = -1;
+
     while (input[i])
     {
-      while (input[i] && input[i] != '$')
+        if (input[i] == '\'' && !in_double_quote)
         {
-            if(input[i]== '"')
-            {
-                p++;
-                if(h == -1)
-                    h = i;
-             
-            }
-            if(input[i] == '\'' )
-            {
-                    z++;
-                if(b == -1 || input[i-1] == '"')
-                    b = i;
-                if(z % 2 == 0)
-                {
-                        z = 0;
-                        
-                }
-            }
+            in_single_quote = !in_single_quote;
             tmp[k++] = input[i++];
         }
-        printf("p == %d\n",p);
-        printf("b == %d\n",b);
-        printf("h == %d\n",h);
-        printf("z == %d\n",z);
-
-        g = i;
-        if (input[i] == '$' && (b == -1 || ( p % 2 == 1 && h <= b)) )
-          {
-                i++; 
-                j = 0;
-                p = 0;
-                z = 0;
-
-                while (input[i] && (is_valid_var_char(input[i])) && input[i] != ' ')
-                {
-                 ptr[j++] = input[i++];
-                }   
-                ptr[j] = '\0';
-                char *value = get_value(env, ptr);
-                if (value)
-                {
-                    int o = 0;
-                    while (value[o])
-                    {
-                         tmp[k++] = value[o++];
-                    }
-                }
-                else
-                {
-                    int m = 0;
-                    tmp[k++] = '$';
-                    while( m < j)
-                    {
-                            tmp[k++] = ptr[m++];
-
-                    }
-                }
-         }
-        if(g == i)
+        else if (input[i] == '"' && !in_single_quote)
+        {
+            in_double_quote = !in_double_quote;
+            tmp[k++] = input[i++];
+        }
+        else if (input[i] == '$' && !in_single_quote)
+        {
             i++;
+            int j = 0;
+            while (input[i] && is_valid_var_char(input[i]) && input[i] != ' ')
+                ptr[j++] = input[i++];
+            ptr[j] = '\0';
+
+            char *value = get_value(env, ptr);
+            if (value)
+            {
+                while (*value)
+                    tmp[k++] = *value++;
+            }
+            else
+            {
+                tmp[k++] = '$';
+                int m = 0;
+                while(m < j)
+                    tmp[k++] = ptr[m++];
+            }
+        }
+        else
+            tmp[k++] = input[i++];
     }
 
     tmp[k] = '\0';
