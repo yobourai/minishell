@@ -248,6 +248,36 @@ char *dollar_sign(char *input, t_env *env)
     return tmp;
 }
 
+int redairection_help(char * input)
+{
+    int i = 0;
+    while(input[i])
+    {
+      if(input[i] == '>' && input[i+1] == ' ' && input[i+2] == '>')
+            return 1;
+      if(input[i] == '<' && input[i+1] == ' ' && input[i+2] == '<')
+            return 1;
+      if((input[i] == '>' && input[i+1] == '<' ) || (input[i] == '>' && input[i+1] == ' ' && input[i+2] == '<'))
+            return 1;
+      if((input[i] == '>' && input[i+1] == '>' && input[i+2] == ' ' && input[i+3] == '>') || (input[i] == '>' && input[i+1] == '>' && input[i+2] == '>'))
+            return 1;
+      if((input[i] == '<' && input[i+1] == '<' && input[i+2] == ' ' && input[i+3] == '<'))
+            return 1;
+      if(input[i] == '|' && input[i+1] == ' ' && input[i+2] == '|')
+            return 1;
+      if((input[i] == '|' && input[i+1] == ' ' && input[i+2] == '<' && input[i+3] == '<') || (input[i] == '|' &&input[i+1] == '<' && input[i+2] == '<'))
+            return 1;
+      if((input[i] == '>' && input[i+1] == ' ' && input[i+2] == '|' ) || (input[i] == '>' &&input[i+1] == '>' && input[i+2] == '|'))
+            return 1;
+      if((input[i] == '<' && input[i+1] == ' ' && input[i+2] == '|' ) || (input[i] == '<' &&input[i+1] == '<' && input[i+2] == '|'))
+            return 1;
+      if(input[i] == '<' && input[i+1] =='|')
+            return 1;
+
+        i++;
+    }
+    return 0;
+}
 int redairectionc_error(char *input)
 {
     int i = 0;
@@ -277,9 +307,13 @@ int redairectionc_error(char *input)
         printf("syntax error near unexpected token \n");
         return 1;
     }
+    if(redairection_help(input) == 1)
+    {
+        printf("syntax error near unexpected token \n");
+        return 1;
+    }
     return 0;
 }
-
 char *inpute(char *input , t_env *env)
 {
     int i = 0;
@@ -292,7 +326,10 @@ char *inpute(char *input , t_env *env)
         input = dollar_sign(input , env);
        input = handle_quotes(input);
        if(redairectionc_error(input) == 1)
-            break;
+        {
+                free(input);
+                continue;
+        }
         printf("%s\n",input);
         if (input == NULL)
         {
