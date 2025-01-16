@@ -1,13 +1,17 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   minishell.c                                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: yobourai <marvin@42.fr>                    +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/12/25 03:20:25 by yobourai          #+#    #+#             */
-/*   Updated: 2024/12/25 03:20:28 by yobourai         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
+#include "minishell.h"
 
+int main(int ac, char **av, char **env)
+{
+    t_bash *bash;
+
+    (void)ac;
+    (void)av;
+    bash = allocation(env);
+    while (1)
+    {
+        inpute(bash);
+        printf("command ready for excution\n");
+    }
+    return 0;
+}

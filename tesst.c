@@ -1,18 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <readline/readline.h>
-#include <readline/history.h>
-#include <string.h>
-#include <unistd.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <string.h>
-#include "./libft/libft.h"
-typedef struct  s_env{
-    char * name ;
-    char *value;
-    struct s_env *next;    
-} t_env ;
+
 
 char *space(char *input) 
 {
@@ -114,55 +100,37 @@ void print_env(t_env *env)
         env = env->next;
     }
 }
-void free_env(t_env * env)
-{
-    t_env * curent = NULL;
-    while (env)
-    {
-        curent = env->next;
-        free(env->name);
-        free(env->value);
-        free(env);
-        env = curent ;
-    }
-    
-}
-t_env   *cnv_env(char **env)
-{
-    if(!*env)
-        return NULL;
-    int i = 0;
-    int j = 0;
-    int k = 0; 
-    t_env * head = NULL;
-    t_env * curent = NULL;
 
-    while (env[i])
-    {
-        j = 0 ;
-        while(env[i][j])
-        {
-            if(env[i][j] == '=')
-            {
-                t_env *cnv = malloc(sizeof(t_env));
-                cnv->name = ft_substr(env[i] ,0,j);
-                cnv->value = ft_substr(env[i] , j+1 , ft_strlen(env[i]));
-                cnv->next = NULL ;
-                if(!head)
-                    head = cnv ;
-                else
-                    curent->next = cnv;
+// char *space(char *input) 
+// {
+//     int i = 0;
+//     int  j = 0;
+//     char *tmp = malloc(strlen(input) + 1);
 
-                curent = cnv;
-                    break;
-            }
-            j++;
-        }        
-        i++;
-    }
-    
-    return head ;
-}
+//     if (!tmp)
+//         return NULL;
+
+//     while (input[i] == ' ' || input[i] == '\t')
+//                 i++;
+//     while (input[i]) 
+//     {
+//          if (input[i] == ' ' || input[i] == '\t')
+//         {
+//             if (j > 0 && tmp[j - 1] != ' ')
+//                 tmp[j++] = ' ';
+//         } 
+//         else
+//             tmp[j++] = input[i];
+//         i++;
+//     }
+
+//     if (j > 0 && tmp[j - 1] == ' ')
+//             j--;
+//     tmp[j] = '\0';
+//     return tmp;
+// }
+
+
 char *get_value(t_env * env , char *value)
 {
     if(!value)
@@ -253,26 +221,7 @@ int redairection_help(char * input)
     int i = 0;
     while(input[i])
     {
-      if(input[i] == '>' && input[i+1] == ' ' && input[i+2] == '>')
-            return 1;
-      if(input[i] == '<' && input[i+1] == ' ' && input[i+2] == '<')
-            return 1;
-      if((input[i] == '>' && input[i+1] == '<' ) || (input[i] == '>' && input[i+1] == ' ' && input[i+2] == '<'))
-            return 1;
-      if((input[i] == '>' && input[i+1] == '>' && input[i+2] == ' ' && input[i+3] == '>') || (input[i] == '>' && input[i+1] == '>' && input[i+2] == '>'))
-            return 1;
-      if((input[i] == '<' && input[i+1] == '<' && input[i+2] == ' ' && input[i+3] == '<'))
-            return 1;
-      if(input[i] == '|' && input[i+1] == ' ' && input[i+2] == '|')
-            return 1;
-      if((input[i] == '|' && input[i+1] == ' ' && input[i+2] == '<' && input[i+3] == '<') || (input[i] == '|' &&input[i+1] == '<' && input[i+2] == '<'))
-            return 1;
-      if((input[i] == '>' && input[i+1] == ' ' && input[i+2] == '|' ) || (input[i] == '>' &&input[i+1] == '>' && input[i+2] == '|'))
-            return 1;
-      if((input[i] == '<' && input[i+1] == ' ' && input[i+2] == '|' ) || (input[i] == '<' &&input[i+1] == '<' && input[i+2] == '|'))
-            return 1;
-      if(input[i] == '<' && input[i+1] =='|')
-            return 1;
+    
 
         i++;
     }
@@ -314,33 +263,7 @@ int redairectionc_error(char *input)
     }
     return 0;
 }
-char *inpute(char *input , t_env *env)
-{
-    int i = 0;
-    char *str ;
-        char *tmp;
-    while (1) 
-    {
-        input = readline("minishell : ");
-        printf("%s\n",input);
-        input = dollar_sign(input , env);
-       input = handle_quotes(input);
-       if(redairectionc_error(input) == 1)
-        {
-                free(input);
-                continue;
-        }
-        printf("%s\n",input);
-        if (input == NULL)
-        {
-            printf("\nExiting...\n");
-            break;
-        }
-        add_history(input);
-        free(input);
-    }
-    return input;
-}
+
 int main(int ac , char **av , char **env)
 {
     (void)ac;
