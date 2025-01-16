@@ -26,6 +26,7 @@ void    inpute(t_bash *bash)
 		add_history(str);
 		if (handle_quotes(bash, str) == 0)
 		{
+			printf("parcing good \n%s\n",str);
 
 		}
 		free(str);

@@ -24,8 +24,7 @@ int check_quotes_errors(char *input, int *single_quotes, int *double_quotes)
 		i++;
 	}
 	if (*double_quotes == 1 || *single_quotes == 1)
-		return (handle_error(input," syntax error 
-			near unexpected token "),1);
+		return (handle_error(NULL," syntax error near unexpected token "),1);
 	return 0;
 }
 
@@ -38,7 +37,7 @@ void truck(char *input)
 	quotes = 0;
 	while (input[i])
 	{
-		if (input[i] == '"' && quotes == 0)
+		if (input[i] == '"' && (quotes == 0 || quotes == 2 ))
 		{
 			input[i] = 31;
 			if (quotes == 2)
@@ -46,7 +45,7 @@ void truck(char *input)
 			else
 				quotes = 2;
 		}
-		else if (input[i] == '\'' && quotes == 0)
+		else if (input[i] == '\'' && (quotes == 0 || quotes == 1))
 		{
 			input[i] = 30;
 			if (quotes == 1)
@@ -70,7 +69,9 @@ void remove_unprint(char *ptr)
 		if(ptr[i] >=1 && ptr[i] <= 31 && ptr[i] != '\t')
 			i++;
 		else if(i != j)
-			ptr[j++] = ptr[i++];
+			ptr[j] = ptr[i];
+		i++;
+		j++;
 	}
 	while(ptr[j])
 		ptr[j++] = '\0';
@@ -114,7 +115,7 @@ int	handle_quotes(t_bash *bash, char *ptr)
 	remove_unprint(ptr);
 	if (handel_redirection(bash , ptr))
 		return (1);
-	if (handel_pipe(bash, ptr))
+	if (handle_pipe(bash, ptr))
 		return (1);
     return (0);
 }

@@ -1,35 +1,41 @@
-#name project minishell
+# Project Name
 NAME = minishell
 
-#Directories
+# Directories
 OBJ_DIR = ./object/
 SRC_DIR = ./
-SRC_FILE = ${wildcard *.c}
+LIBFT_DIR = ./libft/
+SRC_FILE = $(wildcard $(SRC_DIR)*.c)
 
-#COMPILER FLAGS
+# Compiler and Flags
 CC = cc
-INCLUDE = -I$(SRC_DIR) -lreadline
-CFLAGS = -Wall -Wextra -Werror $(INCLUDE) $(FSANITIZE)
+INCLUDE = -I$(SRC_DIR) -I$(LIBFT_DIR)
+CFLAGS = -Wall -Wextra -Werror $(INCLUDE) #$(FSANITIZE)
 FSANITIZE = -fsanitize=address -g
+LIBFT = $(LIBFT_DIR)libft.a
 
-#TARGET
-all : $(OBJ_DIR) $(NAME)
+# Targets
+all: $(OBJ_DIR) $(LIBFT) $(NAME)
 
-$(NAME) : $(SRC_FILE)
-	$(CC) $(CFLAGS) -o $(NAME) $(INCLUDE) 
-$(OBJ_DIR)%.o: %.c | $(OBJ_DIR)
-	$(CC) $(CFLAGS) -c $< -o $>
+$(NAME): $(OBJ_DIR) $(SRC_FILE) $(LIBFT)
+	$(CC) $(CFLAGS) -o $(NAME) $(SRC_FILE) $(LIBFT) -lreadline
 
-$(OBJ_DIR) :
-	@[ -d ${OBJ_DIR} ] || (echo "Creating directory ${OBJ_DIR}" && mkdir -p ${OBJ_DIR})
+$(LIBFT):
+	$(MAKE) -C $(LIBFT_DIR) all
 
-clean :
-	${RM} ${OBJ_DIR}
+$(OBJ_DIR):
+	@[ -d $(OBJ_DIR) ] || (echo "Creating directory $(OBJ_DIR)" && mkdir -p $(OBJ_DIR))
 
-fclean : clean
-		${RM} ${NAME}
-		@echo
+clean:
+	${RM} -r $(OBJ_DIR)
+	$(MAKE) -C $(LIBFT_DIR) clean
 
-re : fclean all
+fclean: clean
+	${RM} $(NAME)
+	$(MAKE) -C $(LIBFT_DIR) fclean
+	@echo "All files cleaned."
+
+re: fclean all
 
 .PHONY: all clean fclean re
+

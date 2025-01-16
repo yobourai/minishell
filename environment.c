@@ -29,14 +29,14 @@ t_env	*get_env(char *env)
 	curent->name = ft_substr(env ,0,j);
 	if(!curent->name)
 	{
-		handle_error(curent , "failure allocation\n");
+		handle_error(NULL , "failure allocation\n");
 		return (NULL);
 	}
 	curent->value = ft_substr(env , j+1 , ft_strlen(env));
 	if(!curent->value)
 	{
 		free(curent->name);
-		handle_error(curent , "failure allocation\n");
+		handle_error(NULL , "failure allocation\n");
 		return (NULL);
 	}
 	curent->next = NULL;
@@ -95,7 +95,7 @@ t_bash *allocation(char **env)
         nada->env = cnv_env(env);
         if(!nada->env)
         {
-            handle_error(nada , "failure allocatin\n");
+            handle_error(NULL , "failure allocatin\n");
             exit(1);
         }
     }
