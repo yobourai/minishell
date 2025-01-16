@@ -1,0 +1,101 @@
+
+char *get_value(t_env * env , char *value)
+{
+    if(!value)
+        return NULL;
+    while(env)
+    {
+        if(strcmp(env->name , value) == 0)
+        {
+            return env->value;
+        }
+        env = env->next;
+    }
+    return NULL;
+}
+
+int is_valid_var_char(char c)
+{
+    return ((c >= 'a' && c <= 'z') || 
+            (c >= 'A' && c <= 'Z') ||
+            (c >= '0' && c <= '9') || 
+            c == '_');
+}
+
+char *dollar_sign(char *input, t_env *env)
+{
+    int i = 0;
+    int  k = 0;
+    int in_single_quote = 0;
+    int in_double_quote = 0;
+    if(!input)
+        return NULL;
+    char *tmp = malloc(strlen(input) * 500 + 1);
+    if (!tmp)
+        return NULL;
+
+    char *ptr = malloc(strlen(input) * 10 + 1);
+    if (!ptr)
+    {
+        free(tmp);
+        return NULL;
+    }
+
+    while (input[i])
+    {
+        if (input[i] == '\'' && !in_double_quote)
+        {
+            in_single_quote = !in_single_quote;
+            tmp[k++] = input[i++];
+        }
+        else if (input[i] == '"' && !in_single_quote)
+        {
+            in_double_quote = !in_double_quote;
+            tmp[k++] = input[i++];
+        }
+        else if (input[i] == '$' && !in_single_quote)
+        {
+            i++;
+            int j = 0;
+            while (input[i] && is_valid_var_char(input[i]) && input[i] != ' ')
+                ptr[j++] = input[i++];
+            ptr[j] = '\0';
+
+            char *value = get_value(env, ptr);
+            if (value)
+            {
+                while (*value)
+                    tmp[k++] = *value++;
+            }
+            else
+            {
+                tmp[k++] = '$';
+                int m = 0;
+                while(m < j)
+                    tmp[k++] = ptr[m++];
+            }
+        }
+        else
+            tmp[k++] = input[i++];
+    }
+
+    tmp[k] = '\0';
+    free(ptr);
+    return tmp;
+}
+
+
+int main(int ac , char **av , char **env)
+{
+    (void)ac;
+    (void)av;
+    char * input ;
+    t_env * anv = cnv_env(env);
+    // // print_env(anv);
+    input = inpute(input , anv);
+    // char *value = dollar_sign(input , anv);
+    //  input = get_value(anv,NULL );
+    // input = inpute(input , anv);
+    // input = dollar_sign(input , anv);
+     printf("%s\n",input);
+}

@@ -42,20 +42,23 @@ typedef struct s_bash
 }t_bash;
 
 //handle_quotes.c
-void    handle_error(char *data , char *message);
 int     check_quotes_errors(char *input, int *single_quotes, int *double_quotes);
 void	truck(char *input);
 void	remove_unprint(char *ptr);
+int check_pipe(char *ptr);
 int		handle_quotes(t_bash *bash, char *ptr);
 
 //redirection.c
 int skip_red(char *ptr, int *qoutes);
 int error_red(char *ptr);
+int handle_pipe(t_bash *bash, char *ptr);
+void check_qoutes(char input, int *qoutes);
 int handel_redirection(t_bash *bash, char *ptr);
 
 //read_line.c
 //read line from user
 void	inpute(t_bash *bash);
+void handle_error(char *data,char *message);
 
 
 //environment.c	//done

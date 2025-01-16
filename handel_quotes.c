@@ -1,12 +1,5 @@
 #include "minishell.h"
 
-void handle_error(char *data,char *message)
-{
-    if(data)
-        free(data);
-    ft_putstr_fd(message,2);
-}
-
 int check_quotes_errors(char *input, int *single_quotes, int *double_quotes)
 {
 	int i;
@@ -83,6 +76,19 @@ void remove_unprint(char *ptr)
 		ptr[j++] = '\0';
 	truck(ptr);
 }
+int check_pipe(char *ptr)
+{
+	int i;
+	i = 0;
+	while(ptr[i] == ' ' || ptr[i] == '\t')
+		i++;
+	if(ptr[i] == '|')
+	{
+		handle_error(NULL , "syntax error near unexpected token |\n");
+		return (1);
+	}
+	return (0);
+}
 
 int	handle_quotes(t_bash *bash, char *ptr)
 {
@@ -91,6 +97,11 @@ int	handle_quotes(t_bash *bash, char *ptr)
 
     single_quotes = 0;
     double_quotes = 0;
+	if(check_pipe(ptr))
+	{
+		bash->exit_status = 1;
+		return (1);
+	}
 	if(check_quotes_errors(ptr , &single_quotes , &double_quotes))
 	{
 		if(single_quotes == 1)
@@ -102,6 +113,8 @@ int	handle_quotes(t_bash *bash, char *ptr)
 	}
 	remove_unprint(ptr);
 	if (handel_redirection(bash , ptr))
+		return (1);
+	if (handel_pipe(bash, ptr))
 		return (1);
     return (0);
 }

@@ -1,5 +1,31 @@
 #include "minishell.h"
+int handle_pipe(t_bash *bash, char *ptr)
+{
+	int i;
+	int number_pip;
 
+	number_pip = 0;
+	i = 0;
+    while(ptr[i])
+    {
+		if(ptr[i] == '|')
+			number_pip++;
+		else if(ptr[i] == ' ' || ptr[i] == '\t')
+			number_pip = number_pip;
+		else
+			number_pip = 0;
+		if(number_pip > 1)
+			break;
+		i++;
+	}
+	if(number_pip > 1 || ptr[i] == '\0')
+	{
+		bash->exit_status = 1;
+		ft_putstr_fd("syntax error near unexpected token |\n", 2);
+		return 1;
+	}
+    return 0;
+}
 void check_qoutes(char input, int *qoutes)
 {
     if (input == 31 && *quotes == 0)
@@ -35,31 +61,24 @@ int error_red(char *ptr)
     int i;
 
     i = 0;
-    if(ptr[1] == ptr[0])
+    if (ptr[i] == ptr[i+1])
         i++;
+	i++;
     while (ptr[i] == ' ' || ptr[i] == '\t')
         i++;
-      if(input[i] == '>' && input[i+1] == ' ' && input[i+2] == '>')
-            return 1;
-      if(input[i] == '<' && input[i+1] == ' ' && input[i+2] == '<')
-            return 1;
-      if((input[i] == '>' && input[i+1] == '<' ) || (input[i] == '>' && input[i+1] == ' ' && input[i+2] == '<'))
-            return 1;
-      if((input[i] == '>' && input[i+1] == '>' && input[i+2] == ' ' && input[i+3] == '>') || (input[i] == '>' && input[i+1] == '>' && input[i+2] == '>'))
-            return 1;
-      if((input[i] == '<' && input[i+1] == '<' && input[i+2] == ' ' && input[i+3] == '<'))
-            return 1;
-      if(input[i] == '|' && input[i+1] == ' ' && input[i+2] == '|')
-            return 1;
-      if((input[i] == '|' && input[i+1] == ' ' && input[i+2] == '<' && input[i+3] == '<') || (input[i] == '|' &&input[i+1] == '<' && input[i+2] == '<'))
-            return 1;
-      if((input[i] == '>' && input[i+1] == ' ' && input[i+2] == '|' ) || (input[i] == '>' &&input[i+1] == '>' && input[i+2] == '|'))
-            return 1;
-      if((input[i] == '<' && input[i+1] == ' ' && input[i+2] == '|' ) || (input[i] == '<' &&input[i+1] == '<' && input[i+2] == '|'))
-            return 1;
-      if(input[i] == '<' && input[i+1] =='|')
-            return 1;
-    
+	if (ptr[i] == '\0' || ptr[i] == '>' || ptr[i] == '<' || ptr[i] == '|')
+	{
+		if(ptr[i] == '\0')
+			ft_putstr_fd("syntax error near unexpected token newline",2);
+    	else if (ptr[i] == '>')
+			ft_putstr_fd("syntax error near unexpected token <",2);
+    	else if (ptr[i] == '<')
+        	ft_putstr_fd("syntax error near unexpected token <",2);
+    	else if ((ptr[i] == '|'))
+        	ft_putstr_fd("syntax error near unexpected token |",2);
+		return 1;
+	}
+	return 0;
 }
 
 int handel_redirection(t_bash *bash, char *ptr)
@@ -75,7 +94,7 @@ int handel_redirection(t_bash *bash, char *ptr)
         if(quotes)
            quotes = skip_red(&ptr[i] , &quotes);
         i += quotes;
-        if ((ptr[i] == '>' || ptr[i] == '<') && error_red(ptr))
+        if ((ptr[i] == '>' || ptr[i] == '<') && error_red(ptr+i))
         {
             bash->exit_status = 1;
             return 1;

@@ -1,5 +1,12 @@
 #include "minishell.h"
 
+void handle_error(char *data,char *message)
+{
+    if(data)
+        free(data);
+    ft_putstr_fd(message,2);
+}
+
 void    inpute(t_bash *bash)
 {
 	char	*str;
@@ -20,19 +27,7 @@ void    inpute(t_bash *bash)
 		if (handle_quotes(bash, str) == 0)
 		{
 
-		// str = dollar_sign(str , env);
-		// if(redairectionc_error(bash) == 1)
-		// {
-		// 	free(bash);
-		// 	continue;
-		// }
-		// printf("%s\n",bash);
-		// if (str == NULL)
-		// {
-		// 	printf("\nExiting...\n");
-		// 	break;
-		// }
-			free(str);
 		}
+		free(str);
     }
 }
