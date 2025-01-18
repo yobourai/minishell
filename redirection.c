@@ -10,9 +10,7 @@ int handle_pipe(t_bash *bash, char *ptr)
     {
 		if(ptr[i] == '|')
 			number_pip++;
-		else if(ptr[i] == ' ' || ptr[i] == '\t')
-			number_pip = number_pip;
-		else
+		else if(ptr[i] != ' ' && ptr[i] != '\t')
 			number_pip = 0;
 		if(number_pip > 1)
 			break;
@@ -48,7 +46,6 @@ int skip_red(char *ptr, int *qoutes)
 {
     int i;
 
-
     i = 1;
     while(ptr[i] && ptr[i] != ptr[0])
         i++;
@@ -79,7 +76,7 @@ int error_red(char *ptr)
 			ft_putstr_fd("syntax error near unexpected token <\n",2);
     	else if (ptr[i] == '<')
         	ft_putstr_fd("syntax error near unexpected token <\n",2);
-		else if ((ptr[i] == '|'))
+		else if (ptr[i] == '|')
 			ft_putstr_fd("syntax error near unexpected token |\n",2);
 		return 1;
 	}

@@ -41,6 +41,15 @@ typedef struct s_bash
 	int		exit_status;
 }t_bash;
 
+int is_valid_char(char c);
+int is_valid_char_first(char c);
+void set_typ(char **ptr, int *type)
+char *get_value(t_env * env , char *value);
+int dollar_sign(char *input, t_env *env);
+t_red *save_redirection(char *ptr , t_env *env);
+
+
+
 //handle_quotes.c
 int     check_quotes_errors(char *input, int *single_quotes, int *double_quotes);
 void	truck(char *input);
@@ -59,6 +68,11 @@ int handel_redirection(t_bash *bash, char *ptr);
 //read line from user
 void	inpute(t_bash *bash);
 void handle_error(char *data,char *message);
+
+//parcing_herdoc.c
+int  help_red(char **ptr , int *flag);
+int size_rd(char *ptr, char *dst);
+t_red *save_rd(char *ptr);
 
 
 //environment.c	//done
