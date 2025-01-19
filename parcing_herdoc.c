@@ -1,15 +1,15 @@
 #include "minishell.h"
 
-int  help_red(char **ptr , int *flag)
+int  help_red(char ptr , int *flag)
 {
-    if (**ptr == '\'' && (*flag == 0 || *flag == 1)) 
+    if (ptr == '\'' && (*flag == 0 || *flag == 1)) 
     {
         if (*flag == 0)
             *flag = 1;
         else if (*flag == 1)
             *flag = 0; 
     }
-    else if (**ptr == '"' && (*flag == 0 || *flag == 2))
+    else if (ptr == '"' && (*flag == 0 || *flag == 2))
     {
         if (*flag == 0)
             *flag = 2;
@@ -32,14 +32,14 @@ int size_rd(char *ptr, char *dst)
     {
         if (flag == 0 && (*ptr == '|' || *ptr == '>' || *ptr == '<' || *ptr == ' '))
             break;
-        else if(help_red(&ptr , &flag))
-                flag = flag;
         else if(*ptr != '\'' && *ptr != '"')
         {
             if(dst)
                 dst[size] = *ptr;
             size++;
         }
+        else 
+            help_red(*ptr ,&flag);
         ptr++;
     }
     if(dst)
