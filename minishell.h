@@ -72,7 +72,6 @@ t_red *save_rd(char *ptr);
 //parcing_redirection.c
 void set_typ(char **ptr, int *type);
 int get_value(t_env *env, char *value);
-int get_value(t_env *env, char *value);
 t_red *save_redirection(char *ptr, t_env *env);
 
 

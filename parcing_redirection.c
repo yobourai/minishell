@@ -155,7 +155,6 @@ int get_value(t_env *env, char *value)
     {
         if (strcmp(env->name, value) == 0)
         {
-			printf("env->value == %s\n",env->value);
             return ft_strlen(env->value);
         }
         env = env->next;
@@ -183,7 +182,7 @@ int  help_red(char ptr , int *flag)
 }
 
 
-int size_hp(char **ptr, t_env *env, int *flag)
+int size_hp(char **ptr, t_env *env)
 {
     int size;
     int j;
@@ -191,8 +190,7 @@ int size_hp(char **ptr, t_env *env, int *flag)
 
     size = 0;
     j = 0;
-    if (**ptr == '$' && *flag != 1)
-    {
+  
         j= 0;
         (*ptr)++;
         while (is_valid_char(**ptr)) 
@@ -202,7 +200,8 @@ int size_hp(char **ptr, t_env *env, int *flag)
          }
         tmp[j] = '\0';
         size += get_value(env, tmp);
-    }
+        if(size == 0)
+            size = ft_strlen(tmp) +1;
     return size ;
 }
 
@@ -218,7 +217,7 @@ int size_st(char *ptr, t_env *env)
     while (*ptr != '\0')
     {
 		if(*ptr == '$' && flag != 1)
-              size += size_hp(&ptr , env , &flag);
+              size += size_hp(&ptr , env);
         else if(*ptr == '\'' || *ptr == '"')
         {
 			help_red(*ptr ,&flag);
@@ -233,29 +232,107 @@ int size_st(char *ptr, t_env *env)
     return size;
 }
 
+char *get_value_cpy(t_env *env, char *value)
+{
+    if (!value)
+        return NULL;
+    while (env)
+    {
+        if (strcmp(env->name, value) == 0)
+            return env->value;
+        env = env->next;
+    }
+    return NULL;
+}
+
+char *cpy_hp(char **ptr, t_env *env)
+{
+    char tmp[1024];
+    char *value = NULL;
+    int j = 0;
+
+    (*ptr)++; 
+    while (is_valid_char_first(**ptr)) 
+    {
+        if(is_valid_char(ptr))
+            break;
+        tmp[j++] = **ptr;
+        (*ptr)++;
+    }
+    tmp[j] = '\0';
+
+    value = get_value_cpy(env, tmp);
+    if (!value)
+      {
+        value = malloc(ft_strlen(tmp) + 2);
+        if (!value)
+            return NULL;
+        value[0] = '$';
+        strcpy(value + 1, tmp);
+      }
+    return value; 
+}
+
+char *cpy_value(char *ptr, t_env *env)
+{
+    int flag ;
+    int size;
+    char *value;
+    char *result;
+    char *res_ptr;
+
+    flag = 0;
+    size = size_st(ptr, env);    
+    result = malloc(size + 1);
+    if (!result)
+        return NULL;
+    res_ptr = result;
+    while (*ptr == ' ' || *ptr == '\t')
+        ptr++; 
+    while (*ptr != '\0')
+    {
+        if (*ptr == '$' && flag != 1) 
+        {
+            value = cpy_hp(&ptr, env);
+            if (value)
+            {
+                while (*value)
+                    *res_ptr++ = *value++;
+            }
+        }
+        else if (*ptr == '\'' || *ptr == '"')
+        {
+            help_red(*ptr, &flag);
+            ptr++;
+        }
+        else
+            *res_ptr++ = *ptr++;
+    }
+    *res_ptr = '\0';
+    return result;
+}
+
 t_red *save_redirection(char *ptr, t_env *env)
 {
+    int size;
+    
     t_red *valeur = malloc(sizeof(t_red));
     if (!valeur)
         return NULL;
     set_typ(&ptr, &valeur->type);
-    printf("type = %d\n", valeur->type);
-    int size;
-    if(valeur->type == 98)
-        size = size_st(ptr +2, env);
+    if (valeur->type == 98)
+        size = size_st(ptr + 2, env);
     else
-        size = size_st(ptr +1, env);
-    printf("size = %d\n", size);
-    valeur->value = malloc(sizeof(t_red) * size +1);
+        size = size_st(ptr + 1, env);
+     if (valeur->type == 98)
+        valeur->value = cpy_value(ptr + 2, env);
+    else
+       valeur->value = cpy_value(ptr + 1, env);
     if (!valeur->value)
     {
         free(valeur);
         return NULL;
     }
-    
-    printf("value = %s\n", valeur->value);
-    valeur->value[0] = '\0';
-
     return valeur;
 }
 
@@ -264,9 +341,9 @@ int main(int ac, char **av, char **env)
     (void)ac;
 	(void)av;
     t_env *tmp = cnv_env(env);
-    t_red *ptr = save_redirection(">> '$USER''$USER'$USER", tmp);
-        // printf("value = %s\n", ptr->value);
-        // printf("type = %d\n", ptr->type);
+    t_red *ptr = save_redirection(">> $USEdfdf$USEddR $USEkR", tmp);
+        printf("value = %s\n", ptr->value);
+        printf("type = %d\n", ptr->type);
     return 0;
 }
 
