@@ -183,42 +183,52 @@ int  help_red(char ptr , int *flag)
 }
 
 
+int size_hp(char **ptr, t_env *env, int *flag)
+{
+    int size;
+    int j;
+    char tmp[1024];
+
+    size = 0;
+    j = 0;
+    if (**ptr == '$' && *flag != 1)
+    {
+        j= 0;
+        (*ptr)++;
+        while (is_valid_char(**ptr)) 
+         {
+             tmp[j++] = **ptr;
+             (*ptr)++;
+         }
+        tmp[j] = '\0';
+        size += get_value(env, tmp);
+    }
+    return size ;
+}
+
 int size_st(char *ptr, t_env *env)
 {
-    int flag = 0;
-    int size = 0;
-	char *tmp;
-	int j = 0;
-    int i = 0;
-    printf("ptr==> %s\n",ptr);
-    while (ptr[i] == ' ' || ptr[i] == '\t')
-            i++;
-    while (ptr[i] != '\0')
+    int flag ;
+    int size;
+
+    size = 0;
+    flag = 0;
+    while (*ptr == ' ' || *ptr == '\t')
+            (ptr)++;
+    while (*ptr != '\0')
     {
-		if(ptr[i] != '\'' && ptr[i] != '"')
-		{
-        
-        	if (ptr[i] == '$' && flag != 1)
-        	{
-					 i++;
-                     j= 0;
-                while (is_valid_char(ptr[i])) 
-                            tmp[j++] = ptr[i++];
-                    
-                tmp[j] = '\0';
-                size += get_value(env, tmp);
-			}
-        	else
-            {
-                i++;
-				size++;
-            }
-		}
-		else 
-		{
-			help_red(ptr[i] ,&flag);
-            i++;
-		}
+		if(*ptr == '$' && flag != 1)
+              size += size_hp(&ptr , env , &flag);
+        else if(*ptr == '\'' || *ptr == '"')
+        {
+			help_red(*ptr ,&flag);
+            (ptr)++;
+        }
+        else
+        {
+            (ptr)++;
+            size++;
+        }
     }
     return size;
 }
@@ -236,13 +246,15 @@ t_red *save_redirection(char *ptr, t_env *env)
     else
         size = size_st(ptr +1, env);
     printf("size = %d\n", size);
+    valeur->value = malloc(sizeof(t_red) * size +1);
+    if (!valeur->value)
+    {
+        free(valeur);
+        return NULL;
+    }
+    
     printf("value = %s\n", valeur->value);
-    // if (!valeur->value)
-    // {
-    //     free(valeur);
-    //     return NULL;
-    // }
-    // valeur->value[0] = '\0';
+    valeur->value[0] = '\0';
 
     return valeur;
 }
@@ -252,7 +264,7 @@ int main(int ac, char **av, char **env)
     (void)ac;
 	(void)av;
     t_env *tmp = cnv_env(env);
-    t_red *ptr = save_redirection(">> $USERUSddER$USER", tmp);
+    t_red *ptr = save_redirection(">> '$USER''$USER'$USER", tmp);
         // printf("value = %s\n", ptr->value);
         // printf("type = %d\n", ptr->type);
     return 0;
