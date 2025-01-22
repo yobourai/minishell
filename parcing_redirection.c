@@ -1,19 +1,11 @@
 #include "minishell.h"
 
-int is_valid_char(char c)
-{
-    return ((c >= 'a' && c <= 'z') || 
-            (c >= 'A' && c <= 'Z') ||
-            (c >= '0' && c <= '9') || 
-            c == '_');
-}
 void handle_error(char *data,char *message)
 {
     if(data)
         free(data);
     ft_putstr_fd(message,2);
 }
-
 
 void free_env(t_env * env)
 {
@@ -184,7 +176,7 @@ char *cpy_value(char *ptr, t_env *env)
         }
         else if (*ptr == '\'' || *ptr == '"')
         {
-            help_red(*ptr, &flag , &fambg);
+            help_red_add(*ptr, &flag , &fambg);
             ptr++;
         }
         else
@@ -194,44 +186,42 @@ char *cpy_value(char *ptr, t_env *env)
     return result;
 }
 
-int handle_ambg(char *ptr)
+int handle_ambg(char *ptr , int *size)
 {
     int flag;
     int fambg;
+    int i ;
 
     flag = 0;
     fambg = 0;
-    int i = 0;
-
+    i = 0;
     while (*ptr == ' ' || *ptr == '\t')
         ptr++;
     while(*ptr !='\0')
     {
-        if(*ptr != '\'' && *ptr != '"' && fambg == 0)
-        {
-            i++;
-        }
-        else
-        {
-            help_red(*ptr , &flag , &fambg);
+        help_red_add(*ptr, &flag, &fambg);
+        if(fambg == 1)
+            return 0;//no such file
+        if ((*ptr == '|' || *ptr == '>' || *ptr == '<' || *ptr == ' '))
+                break;
             ptr++;
-            i++;
-        }
+            size++;
     }
-    *tmp = '\0';
-    if(ft_strlen(start) == i)
-    {
-         printf("ambgous ==%s\n", start);
-            return i;
-    }        ///ambgous error
-    else
-    {
-        free(start);
-        printf("no such file\n");
-        return 0;
-    }   //no such file
+    i = size -1;
+    return i;//ambgous error
 }
-
+char *cpy_ambg(char *ptr)
+{
+    while (*ptr == ' ' || *ptr == '\t')
+        ptr++;
+    while(*ptr !='\0')
+    {
+        if ((*ptr == '|' || *ptr == '>' || *ptr == '<' || *ptr == ' '))
+                return ptr;
+            ptr++;
+    }
+    return ptr;
+}
 t_red *save_redirection(char *ptr, t_env *env)
 {
     t_red   *valeur;
@@ -251,35 +241,31 @@ t_red *save_redirection(char *ptr, t_env *env)
             valeur->type = handle_ambg(ptr + 2);
         else
             valeur->type = handle_ambg(ptr + 1);
-        printf("allocated size = %d\n", size);
-        if(valeur->type == 19)
+        printf("valeur type = %d\n", valeur->type);
+        if(valeur->type != 0)
         {
             // embguaus size;
+            size = valeur->type +1 ;
+            valeur->type = -1;
             valeur->value = malloc(size + 1);
-            //  check malloc | free struct
+            if(!valeur->value)
+            {
+                free(valeur);
+                return NULL;
+            }
+            valeur->value = cpy_ambg(ptr);
             // cpy variable environment
         }
         else
         {
             valeur->value = malloc(sizeof(char) * 1);
-            //  check malloc | free struct
+            if(!valeur->value)
+            {
+                free(valeur);
+                return NULL;
+            }
         }
         valeur->value[size] = 0;
-        // if(valeur->type == 98)
-        //     size = handle_ambg(ptr + 2);
-        // else
-        //     size = handle_ambg(ptr + 1);
-        // printf("allocated size = %d\n", size);
-        // if(size)
-        // {
-        //     valeur->value = malloc(size + 1);
-        //     valeur->type = 19;
-        // }
-        // else
-        // {
-        //     valeur->value = malloc(sizeof(char) * 1);
-        //     valeur->type = 20;
-        // }
         return valeur;
     }
     else
@@ -288,8 +274,11 @@ t_red *save_redirection(char *ptr, t_env *env)
             valeur->value = cpy_value(ptr + 2, env);
         else
             valeur->value = cpy_value(ptr + 1, env);
-        //  check malloc | free struct
-        
+        if(!valeur->value)
+        {
+            free(valeur);
+            return NULL;
+        }
     }
     return valeur;
 }

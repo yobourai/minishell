@@ -1,6 +1,18 @@
-#include <minishell.h>
+#include "minishell.h"
 
 
+void set_typ(char *ptr, int *type)
+{
+    if (*ptr == '>')
+    {
+        if (*(ptr + 1) == '>')
+            *type = 98;
+        else
+            *type = 96;
+    }
+    else if (*ptr == '<')
+        *type = 97;
+}
 int is_valid_char_first(char c)
 {
     return ((c >= 'a' && c <= 'z') || 
@@ -23,7 +35,7 @@ int get_value(t_env *env, char *value)
     return 0;
 }
 
-int  help_red(char ptr , int *flag , int *fambg)
+int  help_red_add(char ptr , int *flag , int *fambg)
 {
     *fambg = 0;
     if (ptr == '\'' && (*flag == 0 || *flag == 1)) 
@@ -87,7 +99,7 @@ int size_st(char *ptr, t_env *env)
         }
         else if(*ptr == '\'' || *ptr == '"')
         {
-			help_red(*ptr ,&flag , &famg);
+			help_red_add(*ptr ,&flag ,&famg);
             (ptr)++;
         }
         else
@@ -99,15 +111,3 @@ int size_st(char *ptr, t_env *env)
     return size;
 }
 
-void set_typ(char *ptr, int *type)
-{
-    if (*ptr == '>')
-    {
-        if (*(ptr + 1) == '>')
-            *type = 98;
-        else
-            *type = 96;
-    }
-    else if (*ptr == '<')
-        *type = 97;
-}

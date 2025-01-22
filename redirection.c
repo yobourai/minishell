@@ -1,4 +1,5 @@
 #include "minishell.h"
+
 int handle_pipe(t_bash *bash, char *ptr)
 {
 	int i;
