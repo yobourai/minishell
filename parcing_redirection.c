@@ -113,6 +113,124 @@ t_bash *allocation(char **env)
     return (nada);
 }
 
+void set_typ(char *ptr, int *type)
+{
+    if (*ptr == '>')
+    {
+        if (*(ptr + 1) == '>')
+            *type = 98;
+        else
+            *type = 96;
+    }
+    else if (*ptr == '<')
+        *type = 97;
+}
+int is_valid_char_first(char c)
+{
+    return ((c >= 'a' && c <= 'z') || 
+            (c >= 'A' && c <= 'Z') || 
+            c == '_');
+}
+
+int is_valid_char(char c)
+{
+    return ((c >= 'a' && c <= 'z') || 
+            (c >= 'A' && c <= 'Z') || 
+            (c >= '0' && c <= '9') ||
+            c == '_');
+}
+
+int get_value(t_env *env, char *value)
+{
+    if (!value)
+        return 0;
+    while (env)
+    {
+        if (strcmp(env->name, value) == 0)
+        {
+            return ft_strlen(env->value);
+        }
+        env = env->next;
+    }
+    return 0;
+}
+
+int  help_red_add(char ptr , int *flag , int *fambg)
+{
+    *fambg = 0;
+    if (ptr == '\'' && (*flag == 0 || *flag == 1)) 
+    {
+        *fambg = 1;
+        if (*flag == 0)
+            *flag = 1;
+        else if (*flag == 1)
+            *flag = 0; 
+    }
+    else if (ptr == '"' && (*flag == 0 || *flag == 2))
+    {
+        *fambg = 1;
+        if (*flag == 0)
+            *flag = 2;
+        else if (*flag == 2)
+            *flag = 0; 
+    }
+    return 0;
+}
+
+int size_hp(char **ptr, t_env *env)
+{
+    int size;
+    int j;
+    char tmp[1024];
+
+    size = 0;
+    j= 0;
+    (*ptr)++;
+    while (is_valid_char_first(**ptr)) 
+    {
+        if(!is_valid_char(**ptr))
+            break;
+        tmp[j++] = **ptr;
+        (*ptr)++;
+    }
+    tmp[j] = '\0';
+    size += get_value(env, tmp);
+    return size ;
+}
+
+int size_st(char *ptr, t_env *env)
+{
+    int flag ;
+    int size;
+    int famg;
+
+    famg = 0;
+    size = 0;
+    flag = 0;
+    while (*ptr == ' ' || *ptr == '\t')
+        ptr++;
+    while (*ptr != '\0')
+    {
+		if(*ptr == '$' && flag != 1)
+        {
+            size += size_hp(&ptr, env);
+            if(size == 0)
+                return 0;
+        }
+        else if(*ptr == '\'' || *ptr == '"')
+        {
+			help_red_add(*ptr ,&flag ,&famg);
+            (ptr)++;
+        }
+        else
+        {
+            (ptr)++;
+            // size++;
+        }
+    }
+    return size;
+}
+
 char *get_value_cpy(t_env *env, char *value)
 {
     if (!value)
@@ -186,12 +304,14 @@ char *cpy_value(char *ptr, t_env *env)
     return result;
 }
 
-int handle_ambg(char *ptr , int *size)
+int handle_ambg(char *ptr)
 {
     int flag;
     int fambg;
     int i ;
+    int size;
 
+    size = 0;
     flag = 0;
     fambg = 0;
     i = 0;
@@ -212,21 +332,34 @@ int handle_ambg(char *ptr , int *size)
 }
 char *cpy_ambg(char *ptr)
 {
-    while (*ptr == ' ' || *ptr == '\t')
-        ptr++;
-    while(*ptr !='\0')
+    int size;
+    char *tmp;
+    int i = 0;
+    int j = 0;
+    size = handle_ambg(ptr);
+	int flag;
+	int famg;
+    while (ptr[i] == ' ' || ptr[i] == '\t')
+        i++;
+    tmp = malloc(size +2);
+    if(!tmp)
+        return NULL;
+    while(ptr[i] !='\0')
     {
-        if ((*ptr == '|' || *ptr == '>' || *ptr == '<' || *ptr == ' '))
-                return ptr;
-            ptr++;
+		help_red_add(*ptr, &flag, &famg);
+        if ((ptr[i] != '|' && ptr[i] != '>' && ptr[i] != '<' && ptr[i] != ' ') || flag == 1)
+                tmp[j++] = ptr[i++];
+            else
+                return tmp;
     }
-    return ptr;
+    return tmp;
 }
 t_red *save_redirection(char *ptr, t_env *env)
 {
     t_red   *valeur;
     int     size;
-    
+    int		flag; 
+
     valeur = malloc(sizeof(t_red));
     if (!valeur)
         return NULL;
@@ -235,26 +368,29 @@ t_red *save_redirection(char *ptr, t_env *env)
         size = size_st(ptr + 2, env);
     else
         size = size_st(ptr + 1, env);
+	printf("size == %d\n",size);
     if(size == 0)
     {
+        flag = valeur->type;
         if(valeur->type == 98)
             valeur->type = handle_ambg(ptr + 2);
         else
             valeur->type = handle_ambg(ptr + 1);
-        printf("valeur type = %d\n", valeur->type);
         if(valeur->type != 0)
         {
             // embguaus size;
             size = valeur->type +1 ;
             valeur->type = -1;
-            valeur->value = malloc(size + 1);
+			if(flag == 98)
+            	valeur->value = cpy_ambg(ptr + 2);
+			else
+            	valeur->value = cpy_ambg(ptr + 1);
+            // cpy variable environment
             if(!valeur->value)
             {
                 free(valeur);
                 return NULL;
             }
-            valeur->value = cpy_ambg(ptr);
-            // cpy variable environment
         }
         else
         {
@@ -265,7 +401,8 @@ t_red *save_redirection(char *ptr, t_env *env)
                 return NULL;
             }
         }
-        valeur->value[size] = 0;
+        valeur->value[size] = '\0';
+		printf("valeur =%s\n", valeur->value);
         return valeur;
     }
     else
@@ -288,7 +425,7 @@ int main(int ac, char **av, char **env)
     (void)ac;
 	(void)av;
     t_env *tmp = cnv_env(env);
-    t_red *ptr = save_redirection("< $", tmp);
+    t_red *ptr = save_redirection("< $dfbhbshbhs$d'|'gdn", tmp);
     printf("value =%s\n", ptr->value);
     printf("type = %d\n", ptr->type);
     return 0;
