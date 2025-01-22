@@ -59,21 +59,25 @@ int handle_pipe(t_bash *bash, char *ptr);
 void check_qoutes(char input, int *qoutes);
 int handel_redirection(t_bash *bash, char *ptr);
 
+int is_valid_char_first(char c);
+int size_st(char *ptr, t_env *env);
+int is_valid_char(char c);
 //read_line.c
 //read line from user
 void	inpute(t_bash *bash);
 void handle_error(char *data,char *message);
 
 //parcing_herdoc.c
-int  help_red(char ptr , int *flag);
+int  help_red(char ptr , int *flag , int *fambg);
 int size_rd(char *ptr, char *dst);
 t_red *save_rd(char *ptr);
 
 //parcing_redirection.c
-void set_typ(char **ptr, int *type);
 int get_value(t_env *env, char *value);
 t_red *save_redirection(char *ptr, t_env *env);
 
+//  redirection_utils.c
+void set_typ(char *ptr, int *type);
 
 //environment.c	//done
 void    free_env(t_env * env);
