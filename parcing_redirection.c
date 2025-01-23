@@ -195,10 +195,11 @@ int size_st(char *ptr, t_env *env)
     int flag ;
     int size;
     int famg;
-
+    int k;
     famg = 0;
     size = 0;
     flag = 0;
+    k = 0;
     while (*ptr == ' ' || *ptr == '\t')
         ptr++;
     while (*ptr != '\0')
@@ -208,7 +209,14 @@ int size_st(char *ptr, t_env *env)
 		if(*ptr == '$'&& flag != 1)
         {
             if(is_valid_char_first(*(ptr + 1)))
-                size += size_hp(&ptr, env);
+            {
+                k = 0;
+                 k+= size_hp(&ptr, env);
+                 if(k == 0)
+                    return size;
+                else
+                    size+=k;
+            }
             else
                 return size;
         }
@@ -265,12 +273,12 @@ char *cpy_value(char *ptr, t_env *env)
     fambg = 0;
     flag = 0;
     size = size_st(ptr, env);    
+    while (*ptr == ' ' || *ptr == '\t')
+        ptr++; 
     result = malloc(size + 1);
     if (!result)
         return NULL;
     res_ptr = result;
-    while (*ptr == ' ' || *ptr == '\t')
-        ptr++; 
     while (*ptr != '\0')
     {
         if((*ptr == ' ' || *ptr == '\t' || *ptr == '|') && flag == 0)
@@ -285,6 +293,9 @@ char *cpy_value(char *ptr, t_env *env)
                     while (*value)
                         *res_ptr++ = *value++;
                 }
+                else
+                    *res_ptr = '\0';
+                    return result;
             }
             else
             {
@@ -354,6 +365,7 @@ char *cpy_ambg(char *ptr)
     }
     return tmp;
 }
+
 t_red *save_redirection(char *ptr, t_env *env)
 {
     t_red   *valeur;
@@ -425,7 +437,7 @@ int main(int ac, char **av, char **env)
     (void)ac;
 	(void)av;
     t_env *tmp = cnv_env(env);
-    t_red *ptr = save_redirection("< '${FILES[@]} $dfg'", tmp);
+    t_red *ptr = save_redirection("> dddd $FILES[@]|$dfg", tmp);
     printf("value =%s\n", ptr->value);
     printf("type = %d\n", ptr->type);
     return 0;
