@@ -181,6 +181,7 @@ int size_hp(char **ptr, t_env *env)
         if (!is_valid_char(*tmp) && !env->name[j])
         {
             *ptr = tmp;
+            printf("j = %d\n",j);
             return (j);
         }
         env = env->next;
@@ -204,11 +205,12 @@ int size_st(char *ptr, t_env *env)
     {
         if((*ptr == ' ' || *ptr == '\t' || *ptr == '|') && flag == 0)
                 break;
-		if(*ptr == '$' && is_valid_char_first(*(ptr + 1)) && flag != 1)
+		if(*ptr == '$'&& flag != 1)
         {
-            size += size_hp(&ptr, env);
-            if(size == 0)
-                return 0;
+            if(is_valid_char_first(*(ptr + 1)))
+                size += size_hp(&ptr, env);
+            else
+                return size;
         }
         else if(*ptr == '\'' || *ptr == '"')
         {
@@ -223,7 +225,6 @@ int size_st(char *ptr, t_env *env)
     }
     return size;
 }
-
 
 char *cpy_hp(char **ptr, t_env *env)
 {
@@ -274,14 +275,22 @@ char *cpy_value(char *ptr, t_env *env)
     {
         if((*ptr == ' ' || *ptr == '\t' || *ptr == '|') && flag == 0)
             break;
-        if (*ptr == '$' && flag != 1) 
+		if(*ptr == '$'  && flag != 1)
         {
-            value = cpy_hp(&ptr, env);
-            if (value)
+            if(is_valid_char_first(*(ptr + 1)))
             {
-                while (*value)
-                    *res_ptr++ = *value++;
+                    value = cpy_hp(&ptr, env);
+                if (value)
+                {
+                    while (*value)
+                        *res_ptr++ = *value++;
+                }
             }
+            else
+            {
+                *res_ptr = '\0';
+                return result;
+            } 
         }
         else if (*ptr == '\'' || *ptr == '"')
         {
@@ -313,7 +322,7 @@ int handle_ambg(char *ptr)
         help_red_add(*ptr, &flag, &fambg);
         if(fambg == 1)
             return 0;//no such file
-        if ((*ptr == '|' || *ptr == '>' || *ptr == '<' || *ptr == ' '))
+        if ((*ptr == '|' || *ptr == '>' || *ptr == '<' || *ptr == ' ') && flag == 0)
                 break;
             ptr++;
             size++;
@@ -416,7 +425,7 @@ int main(int ac, char **av, char **env)
     (void)ac;
 	(void)av;
     t_env *tmp = cnv_env(env);
-    t_red *ptr = save_redirection("< g$dfbhbshbhs$dgdn dfd", tmp);
+    t_red *ptr = save_redirection("< '${FILES[@]} $dfg'", tmp);
     printf("value =%s\n", ptr->value);
     printf("type = %d\n", ptr->type);
     return 0;
