@@ -140,21 +140,6 @@ int is_valid_char(char c)
             c == '_');
 }
 
-int get_value(t_env *env, char *value)
-{
-    if (!value)
-        return 0;
-    while (env)
-    {
-        if (strcmp(env->name, value) == 0)
-        {
-            return ft_strlen(env->value);
-        }
-        env = env->next;
-    }
-    return 0;
-}
-
 int  help_red_add(char ptr , int *flag , int *fambg)
 {
     *fambg = 0;
@@ -179,23 +164,29 @@ int  help_red_add(char ptr , int *flag , int *fambg)
 
 int size_hp(char **ptr, t_env *env)
 {
-    int size;
-    int j;
-    char tmp[1024];
+    char    *tmp;
+    int     size;
+    int     j;
 
-    size = 0;
-    j= 0;
-    (*ptr)++;
-    while (is_valid_char_first(**ptr)) 
+    while (env)
     {
-        if(!is_valid_char(**ptr))
-            break;
-        tmp[j++] = **ptr;
-        (*ptr)++;
+        j= 0;
+        tmp = *ptr;
+        while (is_valid_char(*(++tmp)) && env->name[j]) 
+        {
+            if (*tmp != env->name[j])
+                break ;
+            j++;
+        }
+        if (!is_valid_char(*tmp) && !env->name[j])
+        {
+            *ptr = tmp;
+            return (j);
+        }
+        env = env->next;
     }
-    tmp[j] = '\0';
-    size += get_value(env, tmp);
-    return size ;
+    *ptr = tmp;
+    return 0;
 }
 
 int size_st(char *ptr, t_env *env)
@@ -211,7 +202,9 @@ int size_st(char *ptr, t_env *env)
         ptr++;
     while (*ptr != '\0')
     {
-		if(*ptr == '$' && flag != 1)
+        if((*ptr == ' ' || *ptr == '\t' || *ptr == '|') && flag == 0)
+                break;
+		if(*ptr == '$' && is_valid_char_first(*(ptr + 1)) && flag != 1)
         {
             size += size_hp(&ptr, env);
             if(size == 0)
@@ -225,42 +218,38 @@ int size_st(char *ptr, t_env *env)
         else
         {
             (ptr)++;
-            // size++;
+            size++;
         }
     }
     return size;
 }
 
-char *get_value_cpy(t_env *env, char *value)
-{
-    if (!value)
-        return NULL;
-    while (env)
-    {
-        if (strcmp(env->name, value) == 0)
-            return env->value;
-        env = env->next;
-    }
-    return NULL;
-}
 
 char *cpy_hp(char **ptr, t_env *env)
 {
-    char tmp[1024];
-    char *value = NULL;
-    int j = 0;
+     char    *tmp;
+    int     size;
+    int     j;
 
-    (*ptr)++; 
-    while (is_valid_char_first(**ptr)) 
+    while (env)
     {
-        if(!is_valid_char(**ptr))
-            break;
-        tmp[j++] = **ptr;
-        (*ptr)++;
+        j= 0;
+        tmp = *ptr;
+        while (is_valid_char(*(++tmp)) && env->name[j]) 
+        {
+            if (*tmp != env->name[j])
+                break ;
+            j++;
+        }
+        if (!is_valid_char(*tmp) && !env->name[j])
+        {
+            *ptr = tmp;
+            return (env->name);
+        }
+        env = env->next;
     }
-    tmp[j] = '\0';
-    value = get_value_cpy(env, tmp);
-    return value;
+    *ptr = tmp;
+    return NULL;
 }
 
 char *cpy_value(char *ptr, t_env *env)
@@ -283,6 +272,8 @@ char *cpy_value(char *ptr, t_env *env)
         ptr++; 
     while (*ptr != '\0')
     {
+        if((*ptr == ' ' || *ptr == '\t' || *ptr == '|') && flag == 0)
+            break;
         if (*ptr == '$' && flag != 1) 
         {
             value = cpy_hp(&ptr, env);
@@ -425,7 +416,7 @@ int main(int ac, char **av, char **env)
     (void)ac;
 	(void)av;
     t_env *tmp = cnv_env(env);
-    t_red *ptr = save_redirection("< $dfbhbshbhs$d'|'gdn", tmp);
+    t_red *ptr = save_redirection("< g$dfbhbshbhs$dgdn dfd", tmp);
     printf("value =%s\n", ptr->value);
     printf("type = %d\n", ptr->type);
     return 0;

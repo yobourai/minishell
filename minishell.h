@@ -75,7 +75,7 @@ t_red *save_rd(char *ptr);
 //typ of redirection
 void set_typ(char *ptr, int *type);
 //get size value from env 
-int get_value(t_env *env, char *value);
+int get_value(t_env *env, char value);
 //valid or not valid char for expanding
 int is_valid_char(char c);
 int is_valid_char_first(char c);
