@@ -81,7 +81,7 @@ int is_valid_char(char c);
 int is_valid_char_first(char c);
 //size 
 int size_st(char *ptr, t_env *env);
-int size_hp(char **ptr, t_env *env);
+int size_hp(char **ptr, t_env *env , int *flag);
 //checking quotes
 int  help_red_add(char ptr , int *flag , int *fambg);
 
@@ -91,9 +91,9 @@ int  help_red_add(char ptr , int *flag , int *fambg);
 //checking ambgous error 
 int handle_ambg(char *ptr);
 // cpy value from env
-char *cpy_value(char **ptr, t_env *env , char *dest , int size);
+char *cpy_value(char **ptr, t_env *env , char *dest);
 //help to get value from env
-int     cpy_hp(char **ptr, t_env *env , char *dest);
+char *cpy_hp(char **ptr, t_env *env , char *dest , int *flag);
 //get the value from env
 char *get_value_cpy(t_env *env, char *value);
 //save redirection and checking all shit
