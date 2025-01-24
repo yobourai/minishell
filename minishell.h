@@ -91,9 +91,9 @@ int  help_red_add(char ptr , int *flag , int *fambg);
 //checking ambgous error 
 int handle_ambg(char *ptr);
 // cpy value from env
-char *cpy_value(char *ptr, t_env *env);
+char *cpy_value(char **ptr, t_env *env , char *dest , int size);
 //help to get value from env
-char *cpy_hp(char **ptr, t_env *env);
+int     cpy_hp(char **ptr, t_env *env , char *dest);
 //get the value from env
 char *get_value_cpy(t_env *env, char *value);
 //save redirection and checking all shit

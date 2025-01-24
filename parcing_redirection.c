@@ -182,10 +182,12 @@ int size_hp(char **ptr, t_env *env)
         {
             *ptr = tmp;
             printf("j = %d\n",j);
-            return (j);
+            return (ft_strlen(env->value));
         }
         env = env->next;
     }
+    // while (is_valid_char(*tmp))
+    //     tmp++;
     *ptr = tmp;
     return 0;
 }
@@ -206,20 +208,11 @@ int size_st(char *ptr, t_env *env)
     {
         if((*ptr == ' ' || *ptr == '\t' || *ptr == '|') && flag == 0)
                 break;
-		if(*ptr == '$'&& flag != 1)
-        {
-            if(is_valid_char_first(*(ptr + 1)))
-            {
-                k = 0;
-                 k+= size_hp(&ptr, env);
-                 if(k == 0)
-                    return size;
-                else
-                    size+=k;
-            }
-            else
-                return size;
-        }
+		if(*ptr == '$'&& flag != 1 && is_valid_char_first(*(ptr + 1)))
+          {
+              size += size_hp(&ptr, env);
+              ptr++;
+          }
         else if(*ptr == '\'' || *ptr == '"')
         {
 			help_red_add(*ptr ,&flag ,&famg);
@@ -229,14 +222,16 @@ int size_st(char *ptr, t_env *env)
         {
             (ptr)++;
             size++;
+            printf("Dd\n");
         }
     }
+    printf("size vv%d\n",size);
     return size;
 }
 
-char *cpy_hp(char **ptr, t_env *env)
+int cpy_hp(char **ptr, t_env *env , char *dest)
 {
-     char    *tmp;
+    char    *tmp;
     int     size;
     int     j;
 
@@ -253,66 +248,62 @@ char *cpy_hp(char **ptr, t_env *env)
         if (!is_valid_char(*tmp) && !env->name[j])
         {
             *ptr = tmp;
-            return (env->name);
+            while (*env->value)
+            {
+                *dest++ = *env->value++;
+            }
+            return (ft_strlen (env->value));
         }
         env = env->next;
     }
+    while (is_valid_char(*tmp))
+        tmp++;
     *ptr = tmp;
-    return NULL;
+    return 0;
 }
 
-char *cpy_value(char *ptr, t_env *env)
+char *cpy_value(char **ptr, t_env *env , char *dest , int size)
 {
-    int flag ;
-    int size;
-    char *value;
-    char *result;
-    char *res_ptr;
-    int fambg;
 
-    fambg = 0;
+    int flag;
+    char *str;
+    int j;
+    j = size;
+    str = *ptr;
+    str++;
+    if (*str == '>')
+        str++;
     flag = 0;
-    size = size_st(ptr, env);    
-    while (*ptr == ' ' || *ptr == '\t')
-        ptr++; 
-    result = malloc(size + 1);
-    if (!result)
-        return NULL;
-    res_ptr = result;
-    while (*ptr != '\0')
+    while (*str == ' ' || *str == '\t')
+        (str)++;
+    while (*str != '\0' && size > 0)
     {
-        if((*ptr == ' ' || *ptr == '\t' || *ptr == '|') && flag == 0)
-            break;
-		if(*ptr == '$'  && flag != 1)
+        if((*str == ' ' || *str == '\t' || *str == '|') && flag == 0)
+                break;
+		if(*str == '$'  && flag != 1 && is_valid_char_first(*(str + 1)))
         {
-            if(is_valid_char_first(*(ptr + 1)))
-            {
-                    value = cpy_hp(&ptr, env);
-                if (value)
-                {
-                    while (*value)
-                        *res_ptr++ = *value++;
-                }
-                else
-                    *res_ptr = '\0';
-                    return result;
-            }
-            else
-            {
-                *res_ptr = '\0';
-                return result;
-            } 
+                printf("size %d\n",size);
+                size -= cpy_hp(&str, env , dest);
+                printf("dest %s\n",dest);
+                printf("size %d\n",size);
         }
-        else if (*ptr == '\'' || *ptr == '"')
+        else if (*str == '\'' || *str == '"')
         {
-            help_red_add(*ptr, &flag , &fambg);
-            ptr++;
+            help_red_add(*str, &flag ,0);
+            (str)++;
         }
         else
-            *res_ptr++ = *ptr++;
+        {
+            // *dest = *str;
+            str++;
+            // dest++;
+            size--;
+        }
+        // dest = dest +j - size;
     }
-    *res_ptr = '\0';
-    return result;
+    *str = '\0';
+    *ptr = str;
+    return dest;
 }
 
 int handle_ambg(char *ptr)
@@ -417,18 +408,15 @@ t_red *save_redirection(char *ptr, t_env *env)
 		printf("valeur =%s\n", valeur->value);
         return valeur;
     }
-    else
+    valeur->value = malloc(size + 1);
+
+    if(!valeur->value)
     {
-        if (valeur->type == 98)
-            valeur->value = cpy_value(ptr + 2, env);
-        else
-            valeur->value = cpy_value(ptr + 1, env);
-        if(!valeur->value)
-        {
-            free(valeur);
-            return NULL;
-        }
+        free(valeur);
+        return NULL;
     }
+    valeur->value = cpy_value(&ptr, env , valeur->value , size);
+    valeur->value[size] = '\0';
     return valeur;
 }
 
@@ -437,7 +425,7 @@ int main(int ac, char **av, char **env)
     (void)ac;
 	(void)av;
     t_env *tmp = cnv_env(env);
-    t_red *ptr = save_redirection("> dddd $FILES[@]|$dfg", tmp);
+    t_red *ptr = save_redirection("> aa$FILES[@]|$dfg", tmp);
     printf("value =%s\n", ptr->value);
     printf("type = %d\n", ptr->type);
     return 0;
