@@ -73,7 +73,7 @@ t_red *save_rd(char *ptr);
 //  redirection_utils.c
 
 //typ of redirection
-void set_typ(char *ptr, int *type);
+void set_typ(char **ptr, int *type);
 //get size value from env 
 int get_value(t_env *env, char value);
 //valid or not valid char for expanding
@@ -81,9 +81,9 @@ int is_valid_char(char c);
 int is_valid_char_first(char c);
 //size 
 int size_st(char *ptr, t_env *env);
-int size_hp(char **ptr, t_env *env , int *flag);
+int size_hp(char **ptr, t_env *env);
 //checking quotes
-int  help_red_add(char ptr , int *flag , int *fambg);
+int  help_red_add(char ptr , int *flag);
 
 
 //parcing_redirection.c
@@ -93,7 +93,7 @@ int handle_ambg(char *ptr);
 // cpy value from env
 char *cpy_value(char **ptr, t_env *env , char *dest);
 //help to get value from env
-char *cpy_hp(char **ptr, t_env *env , char *dest , int *flag);
+char *cpy_hp(char **ptr, t_env *env);
 //get the value from env
 char *get_value_cpy(t_env *env, char *value);
 //save redirection and checking all shit
