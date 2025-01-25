@@ -178,22 +178,17 @@ int size_hp(char **ptr, t_env *env , int *flag )
                 break ;
             j++;
         }
-       if ((*tmp== ' ' || *tmp == '\t' || *tmp == '|' || *tmp == '<' || *tmp == '>' )&& !env->name[j] && *flag == 0)
+       if ((*tmp== ' ' || *tmp == '\t' || *tmp == '|' || *tmp == '<' || *tmp == '>' || *tmp == '$') && (!env->name[j] && *flag == 0))
         {
             *ptr = tmp;
             return (ft_strlen(env->value));
         }
         env = env->next;
     }
-    while (*tmp)
-        {
-            if((*tmp == ' ' || *tmp == '\t' || *tmp == '|' || *tmp == '<' || *tmp == '>') && *flag == 0)
-                break;
-            i++;
+    while (is_valid_char(*tmp))
             tmp++;
-        }
     *ptr = tmp;
-    return i+1;
+    return 0;
 }
 
 int size_st(char *ptr, t_env *env)
@@ -246,7 +241,7 @@ char *cpy_hp(char **ptr, t_env *env , char *dest , int *flag)
                 break ;
             j++;
         }
-        if ((*tmp== ' ' || *tmp == '\t' || *tmp == '|' || *tmp == '<' || *tmp == '>' )&& !env->name[j] && *flag == 0)
+        if ((*tmp== ' ' || *tmp == '\t' || *tmp == '|' || *tmp == '<' || *tmp == '>' || *tmp == '$')&& !env->name[j] && *flag == 0)
         {
             *ptr = tmp;
             strcpy(dest , env->value);
@@ -254,14 +249,11 @@ char *cpy_hp(char **ptr, t_env *env , char *dest , int *flag)
         }
         env = env->next;
     }
-    dest[0] = '$';
-    // while(tmp[i])
-    // {
-    //     dest[i+1] = tmp[i];
-    //     i++;
-    // }
+    while(is_valid_char(*tmp))
+            tmp++;
+    printf("tmp=%s\n",tmp);
     *ptr = tmp;
-    return dest;
+    return NULL;
 }
 
 char *cpy_value(char **ptr, t_env *env , char *dest)
@@ -423,7 +415,7 @@ int main(int ac, char **av, char **env)
     (void)ac;
 	(void)av;
     t_env *tmp = cnv_env(env);
-    t_red *ptr = save_redirection("> cccaa$USER [vvv@]|$dfg", tmp);
+    t_red *ptr = save_redirection("> cccaa$USER$$USER f[vvv@]|$dfg", tmp);
     printf("value =%s\n", ptr->value);
     printf("type = %d\n", ptr->type);
     return 0;
