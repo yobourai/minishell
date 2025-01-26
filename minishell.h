@@ -70,35 +70,44 @@ int  help_red(char ptr , int *flag);
 int size_rd(char *ptr, char *dst);
 t_red *save_rd(char *ptr);
 
-//  redirection_utils.c
 
+
+
+//  redirection_utils.c
 //typ of redirection
 void set_typ(char **ptr, int *type);
-//get size value from env 
-int get_value(t_env *env, char value);
 //valid or not valid char for expanding
 int is_valid_char(char c);
 int is_valid_char_first(char c);
-//size 
-int size_st(char *ptr, t_env *env);
-int size_hp(char **ptr, t_env *env);
+int is_valid_char1(char c);
 //checking quotes
 int  help_red_add(char ptr , int *flag);
 
 
-//parcing_redirection.c
 
+//skipp space
+void skipp_space(char **ptr);
+
+
+//redirecting_utils_ambg.c
 //checking ambgous error 
 int handle_ambg(char *ptr);
-// cpy value from env
-char *cpy_value(char **ptr, t_env *env , char *dest);
-//help to get value from env
-char *cpy_hp(char **ptr, t_env *env);
-//get the value from env
-char *get_value_cpy(t_env *env, char *value);
-//save redirection and checking all shit
-t_red *save_redirection(char *ptr, t_env *env);
+int cpy_ambg_size(char *ptr);
+char *cpy_ambg(char *ptr);
 
+//redirection_utils2.c
+//size 
+int size_st(char *ptr, t_env *env);
+int size_hp(char **ptr, t_env *env);
+// cpy value from env
+char *cpy_hp(char **ptr, t_env *env);
+void copy_value_hp(char **str, char *dest,int *flag, t_env *env);
+char *cpy_value(char **ptr, t_env *env , char *dest);
+
+//parcing_redirection.c
+//save redirection and checking all shit
+t_red *save_redirection_hp(char *ptr, t_env *env);
+t_red *save_redirection(char *ptr, t_env *env);
 
 
 //environment.c	//done

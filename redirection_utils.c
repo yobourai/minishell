@@ -1,17 +1,20 @@
 #include "minishell.h"
 
-
-void set_typ(char *ptr, int *type)
+void set_typ(char **ptr, int *type)
 {
-    if (*ptr == '>')
+    if (**ptr == '>')
     {
-        if (*(ptr + 1) == '>')
+        if (*(*ptr + 1) == '>')
+        {
+            (*ptr)++;
             *type = 98;
+        }
         else
             *type = 96;
     }
-    else if (*ptr == '<')
+    else if (**ptr == '<')
         *type = 97;
+    (*ptr)++;
 }
 int is_valid_char_first(char c)
 {
@@ -20,35 +23,41 @@ int is_valid_char_first(char c)
             c == '_');
 }
 
-int get_value(t_env *env, char *value)
+int is_valid_char(char c)
 {
-    if (!value)
-        return 0;
-    while (env)
-    {
-        if (strcmp(env->name, value) == 0)
-        {
-            return ft_strlen(env->value);
-        }
-        env = env->next;
-    }
-    return 0;
+    return ((c >= 'a' && c <= 'z') || 
+            (c >= 'A' && c <= 'Z') || 
+            (c >= '0' && c <= '9') ||
+            c == '_');
 }
 
-int  help_red_add(char ptr , int *flag , int *fambg)
+int is_valid_char1(char c)
 {
-    *fambg = 0;
-    if (ptr == '\'' && (*flag == 0 || *flag == 1)) 
+    if ((c >= 'a' && c <= 'z') || 
+            (c >= 'A' && c <= 'Z') || 
+            (c >= '0' && c <= '9') ||
+            c == '_')
+        return  (0);
+    return (1);
+}
+
+void skipp_space(char **ptr)
+{
+    while (**ptr == ' ' || **ptr == '\t')
+        (*ptr)++;
+}
+
+int  help_red_add(char ptr , int *flag)
+{
+    if (ptr == 30 && (*flag == 0 || *flag == 1)) 
     {
-        *fambg = 1;
         if (*flag == 0)
             *flag = 1;
         else if (*flag == 1)
-            *flag = 0; 
+            *flag = 0;
     }
-    else if (ptr == '"' && (*flag == 0 || *flag == 2))
+    else if (ptr == 31 && (*flag == 0 || *flag == 2))
     {
-        *fambg = 1;
         if (*flag == 0)
             *flag = 2;
         else if (*flag == 2)
@@ -56,58 +65,3 @@ int  help_red_add(char ptr , int *flag , int *fambg)
     }
     return 0;
 }
-
-int size_hp(char **ptr, t_env *env)
-{
-    int size;
-    int j;
-    char tmp[1024];
-
-    size = 0;
-    j= 0;
-    (*ptr)++;
-    while (is_valid_char_first(**ptr)) 
-    {
-        if(!is_valid_char(**ptr))
-            break;
-        tmp[j++] = **ptr;
-        (*ptr)++;
-    }
-    tmp[j] = '\0';
-    size += get_value(env, tmp);
-    return size ;
-}
-
-int size_st(char *ptr, t_env *env)
-{
-    int flag ;
-    int size;
-    int famg;
-
-    famg = 0;
-    size = 0;
-    flag = 0;
-    while (*ptr == ' ' || *ptr == '\t')
-        ptr++;
-    while (*ptr != '\0')
-    {
-		if(*ptr == '$' && flag != 1)
-        {
-            size += size_hp(&ptr, env);
-            if(size == 0)
-                return 0;
-        }
-        else if(*ptr == '\'' || *ptr == '"')
-        {
-			help_red_add(*ptr ,&flag ,&famg);
-            (ptr)++;
-        }
-        else
-        {
-            (ptr)++;
-            size++;
-        }
-    }
-    return size;
-}
-
