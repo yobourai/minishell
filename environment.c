@@ -1,18 +1,29 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   environment.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: yobourai <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/01/26 05:17:17 by yobourai          #+#    #+#             */
+/*   Updated: 2025/01/26 05:17:19 by yobourai         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
-void free_env(t_env * env)
+void	free_env(t_env *env)
 {
-    t_env * curent;
+	t_env	*curent;
 
-    while (env)
-    {
-        curent = env->next;
-        free(env->name);
-        free(env->value);
-        free(env);
-        env = curent ;
-    }
-    
+	while (env)
+	{
+		curent = env->next;
+		free(env->name);
+		free(env->value);
+		free(env);
+		env = curent;
+	}
 }
 
 t_env	*get_env(char *env)
@@ -20,23 +31,23 @@ t_env	*get_env(char *env)
 	t_env	*curent;
 	int		j;
 
-    j = 0 ;
+	j = 0;
 	curent = malloc(sizeof(t_env));
-    if(!curent && (handle_error(NULL,"failure allocation\n"), 1))
+	if (!curent && (handle_error(NULL, "failure allocation\n"), 1))
 		return (NULL);
-	while(env[j] && env[j] != '=')
+	while (env[j] && env[j] != '=')
 		j++;
-	curent->name = ft_substr(env ,0,j);
-	if(!curent->name)
+	curent->name = ft_substr(env, 0, j);
+	if (!curent->name)
 	{
-		handle_error(NULL , "failure allocation\n");
+		handle_error(NULL, "failure allocation\n");
 		return (NULL);
 	}
-	curent->value = ft_substr(env , j+1 , ft_strlen(env));
-	if(!curent->value)
+	curent->value = ft_substr(env, j + 1, ft_strlen(env));
+	if (!curent->value)
 	{
 		free(curent->name);
-		handle_error(NULL , "failure allocation\n");
+		handle_error(NULL, "failure allocation\n");
 		return (NULL);
 	}
 	curent->next = NULL;
@@ -45,63 +56,63 @@ t_env	*get_env(char *env)
 
 void	env_add_back(t_env **head, t_env *curent)
 {
-	t_env *env;
+	t_env	*env;
 
-	if(!*head)
+	if (!*head)
 	{
 		*head = curent;
 		return ;
 	}
 	env = *head;
-	while(env->next)
+	while (env->next)
 		env = env->next;
 	env->next = curent;
 }
 
-t_env   *cnv_env(char **env)
+t_env	*cnv_env(char **env)
 {
-    t_env   *head;
-    t_env   *curent;
-    int		i;
+	t_env	*head;
+	t_env	*curent;
+	int		i;
 
-    i = 0;
-    head = NULL;
-    while (env[i])
-    {
+	i = 0;
+	head = NULL;
+	while (env[i])
+	{
 		curent = get_env(env[i]);
-		if(!curent)
+		if (!curent)
 		{
 			free_env(head);
-			return (NULL);		
+			return (NULL);
 		}
-		env_add_back(&head , curent);
-        i++;
-    }
-    return (head);
+		env_add_back(&head, curent);
+		i++;
+	}
+	return (head);
 }
 
-t_bash *allocation(char **env)
+t_bash	*allocation(char **env)
 {
-    t_bash *nada;
+	t_bash	*nada;
 
-    nada = malloc(sizeof(t_bash));
-    if(!nada)
-    {
-        handle_error(NULL,"failure allocation\n");
-        exit(1);
-    }
-    if (env && *env)
-    {
-        nada->env = cnv_env(env);
-        if(!nada->env)
-        {
-            handle_error(NULL , "failure allocatin\n");
-            exit(1);
-        }
-    }
-    else
-        nada->env = NULL;
-    nada->cmd = NULL;
-    nada->exit_status = 0;
-    return (nada);
+	nada = malloc(sizeof(t_bash));
+	if (!nada)
+	{
+		handle_error(NULL, "failure allocation\n");
+		exit(1);
+	}
+	if (env && *env)
+	{
+		nada->env = cnv_env(env);
+		if (!nada->env)
+		{
+			handle_error(NULL, "failure allocatin\n");
+			exit(1);
+		}
+	}
+	else
+		nada->env = NULL;
+	nada->cmd = NULL;
+	nada->exit_status = 0;
+	return (nada);
 }

@@ -1,67 +1,74 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   redirection_utils.c                                :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: yobourai <yobourai@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/01/26 05:20:19 by yobourai          #+#    #+#             */
+/*   Updated: 2025/01/26 05:28:26 by yobourai         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
-void set_typ(char **ptr, int *type)
+void	set_typ(char **ptr, int *type)
 {
-    if (**ptr == '>')
-    {
-        if (*(*ptr + 1) == '>')
-        {
-            (*ptr)++;
-            *type = 98;
-        }
-        else
-            *type = 96;
-    }
-    else if (**ptr == '<')
-        *type = 97;
-    (*ptr)++;
-}
-int is_valid_char_first(char c)
-{
-    return ((c >= 'a' && c <= 'z') || 
-            (c >= 'A' && c <= 'Z') || 
-            c == '_');
+	if (**ptr == '>')
+	{
+		if (*(*ptr + 1) == '>')
+		{
+			(*ptr)++;
+			*type = 98;
+		}
+		else
+			*type = 96;
+	}
+	else if (**ptr == '<')
+		*type = 97;
+	(*ptr)++;
 }
 
-int is_valid_char(char c)
+int	is_valid_char_first(char c)
 {
-    return ((c >= 'a' && c <= 'z') || 
-            (c >= 'A' && c <= 'Z') || 
-            (c >= '0' && c <= '9') ||
-            c == '_');
+	return ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_');
 }
 
-int is_valid_char1(char c)
+int	is_valid_char(char c)
 {
-    if ((c >= 'a' && c <= 'z') || 
-            (c >= 'A' && c <= 'Z') || 
-            (c >= '0' && c <= '9') ||
-            c == '_')
-        return  (0);
-    return (1);
+	return ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0'
+			&& c <= '9') || c == '_');
 }
 
-void skipp_space(char **ptr)
+int	is_valid_char1(char c)
 {
-    while (**ptr == ' ' || **ptr == '\t')
-        (*ptr)++;
+	if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0'
+			&& c <= '9') || c == '_')
+		return (0);
+	return (1);
 }
 
-int  help_red_add(char ptr , int *flag)
+void	skipp_space(char **ptr)
 {
-    if (ptr == 30 && (*flag == 0 || *flag == 1)) 
-    {
-        if (*flag == 0)
-            *flag = 1;
-        else if (*flag == 1)
-            *flag = 0;
-    }
-    else if (ptr == 31 && (*flag == 0 || *flag == 2))
-    {
-        if (*flag == 0)
-            *flag = 2;
-        else if (*flag == 2)
-            *flag = 0; 
-    }
-    return 0;
+	while (**ptr == ' ' || **ptr == '\t')
+		(*ptr)++;
+}
+
+int	help_red_add(char ptr, int *flag)
+{
+	if (ptr == 30 && (*flag == 0 || *flag == 1))
+	{
+		if (*flag == 0)
+			*flag = 1;
+		else if (*flag == 1)
+			*flag = 0;
+	}
+	else if (ptr == 31 && (*flag == 0 || *flag == 2))
+	{
+		if (*flag == 0)
+			*flag = 2;
+		else if (*flag == 2)
+			*flag = 0;
+	}
+	return (0);
 }
