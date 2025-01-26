@@ -173,6 +173,12 @@ int  help_red_add(char ptr , int *flag)
     return 0;
 }
 
+void skipp_space(char **ptr)
+{
+    while (**ptr == ' ' || **ptr == '\t')
+        (*ptr)++;
+}
+
 int size_hp(char **ptr, t_env *env)
 {
     char    *tmp;
@@ -208,8 +214,7 @@ int size_st(char *ptr, t_env *env)
 
     size = 0;
     flag = 0;
-    while (*ptr == ' ' || *ptr == '\t')
-        ptr++;
+    skipp_space(&ptr);
     while (*ptr != '\0')
     {
         if((*ptr == ' ' || *ptr == '\t' || *ptr == '|' || *ptr == '<' || *ptr == '>') && flag == 0)
@@ -258,39 +263,44 @@ char *cpy_hp(char **ptr, t_env *env)
     return NULL;
 }
 
+void process_characters(char **str, char *dest, int *j, int *flag, t_env *env)
+{
+    char *value;
+    
+    while (**str != '\0')
+    {
+        if((**str == ' ' || **str == '\t' || **str == '|' || **str == '>' || **str == '<') && *flag == 0)
+            break;
+        if(**str == '$'  && *flag != 1 && is_valid_char_first(*(*str + 1)))
+        {
+            value = cpy_hp(str, env);
+            if(value)
+            {
+                while(*value)
+                    dest[(*j)++] = *value++;
+            }
+        }
+        else if (**str == '\'' || **str == '"')
+        {
+            help_red_add(**str, flag);
+            (*str)++;
+        }
+        else
+            dest[(*j)++] = *(*str)++;
+    }
+}
+
 char *cpy_value(char **ptr, t_env *env , char *dest)
 {
     int flag;
     char *str;
-    char *value;
     int j;
  
     str = *ptr;
     j = 0;
     flag = 0;
-    while (*str == ' ' || *str == '\t')
-        (str)++;
-    while (*str != '\0')
-    {
-        if((*str == ' ' || *str == '\t' || *str == '|' || *str == '>' || *str == '<') && flag == 0)
-                break;
-		if(*str == '$'  && flag != 1 && is_valid_char_first(*(str + 1)))
-        {
-            value= cpy_hp(&str, env);
-            if(value)
-            {
-                while(*value)
-                    dest[j++]=*value++;
-            }
-        }
-        else if (*str == '\'' || *str == '"')
-        {
-            help_red_add(*str, &flag);
-            (str)++;
-        }
-        else
-            dest[j++] = *str++;
-    }
+    skipp_space(&str);
+    process_characters(&str, dest, &j, &flag, env);
     *ptr = str;
     dest[j] = 0;
     return dest;
@@ -307,8 +317,7 @@ int handle_ambg(char *ptr)
     flag = 0;
     fambg = 0;
     i = 0;
-    while (*ptr == ' ' || *ptr == '\t')
-        ptr++;
+    skipp_space(&ptr);
     while(*ptr !='\0')
     {
         if (*ptr == '$' && is_valid_char(*(ptr + 1)))
@@ -321,16 +330,17 @@ int handle_ambg(char *ptr)
     }
     return 1;//ambgous error
 }
-char *cpy_ambg(char *ptr)
-{
-    char *tmp;
-	int flag;
-    int size = 0;
-    int i = 0;
 
+int    cpy_ambg_size(char *ptr)
+{
+	int flag;
+    int size;
+    int i;
+
+    i = 0;
+    size = 0;
     flag = 0;
-    while (*ptr == ' ' || *ptr == '\t')
-        ptr++;
+    skipp_space(&ptr);
     while(ptr[i] !='\0')
     {
         if (ptr[i] == '\'' || ptr[i] == '"')
@@ -341,11 +351,24 @@ char *cpy_ambg(char *ptr)
             size++;
         i++;
     }
+    return size;
+}
+
+char *cpy_ambg(char *ptr)
+{
+    char *tmp;
+	int flag;
+    int size;
+    int i;
+
+    size = cpy_ambg_size(ptr);
+    flag = 0;
+    i = 0;
     tmp = malloc(size + 1);
     if(!tmp)
         return NULL;
-    i = 0;
     size = -1;
+    skipp_space(&ptr);
     while(ptr[i] !='\0')
     {
         if (ptr[i] == '\'' || ptr[i] == '"')
@@ -370,7 +393,7 @@ t_red *save_redirection(char *ptr, t_env *env)
         return NULL;
     set_typ(&ptr, &valeur->type);
     size = size_st(ptr, env);
-    printf("size=%d\n",size);
+    printf("size1=%d\n",size);
     if(size == 0)
     {
         valeur->type = handle_ambg(ptr);
@@ -413,7 +436,7 @@ int main(int ac, char **av, char **env)
     (void)ac;
 	(void)av;
     t_env *tmp = cnv_env(env);
-    t_red *ptr = save_redirection("> ss$USER$$HOME", tmp);
+    t_red *ptr = save_redirection(">   ffb$|USc|ER$HOcME      ", tmp);
     printf("value =%s\n", ptr->value);
     printf("type = %d\n", ptr->type);
     return 0;
