@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parcing_redirection.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yobourai <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: yobourai <yobourai@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 05:19:15 by yobourai          #+#    #+#             */
-/*   Updated: 2025/01/26 05:19:17 by yobourai         ###   ########.fr       */
+/*   Updated: 2025/01/27 00:16:58 by yobourai         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,13 +63,33 @@ t_red	*save_redirection(char *ptr, t_env *env)
 	return (valeur);
 }
 
-// int main(int ac, char **av, char **env)
-// {
-//     (void)ac;
-// 	(void)av;
-//     t_env *tmp = cnv_env(env);
-//     t_red *ptr = save_redirection(">  ''$USEvR", tmp);
-//     printf("value =%s\n", ptr->value);
-//     printf("type = %d\n", ptr->type);
-//     return (0);
-// }
+int	redirection(t_bash *bash, char *src)
+{
+	t_red	*in;
+	t_red	*out;
+	t_cmd	*cmd;
+	int		flag;
+
+	flag = 1;
+	cmd = bash->cmd;
+	while (cmd->next)
+		cmd = cmd->next;
+	while (*src)
+	{
+		if (/*flg*/);		//*src pipe
+			break ;
+		else if (/*flg*/);	//*src redirection
+		{
+			if (flag)		//*src redirection == red_intput < input
+				//	in = 
+			else if (flag);	//*src redirection != here_document | flag if have error ambuguas of no sush file
+				//	out = 
+			else;	//*src here_document	input
+				//	in = 
+			//skip at end of file >file
+		}
+		else
+			src ++;
+	}
+	return (flag);
+}

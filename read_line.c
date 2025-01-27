@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   read_line.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yobourai <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: yobourai <yobourai@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 05:19:47 by yobourai          #+#    #+#             */
-/*   Updated: 2025/01/26 05:19:48 by yobourai         ###   ########.fr       */
+/*   Updated: 2025/01/26 23:52:48 by yobourai         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,18 @@ void	inpute(t_bash *bash)
 		add_history(str);
 		if (handle_quotes(bash, str) == 0)
 		{
-			printf("parcing good \n%s\n", str);
+			bash->cmd = (t_cmd *)malloc(sizeof(t_cmd));
+			if (!bash->cmd)
+			{
+				free_env(bash->env);
+				exit_status = bash->exit_status;
+				free(bash);
+				exit(exit_status);
+			}
+			if (redirection(bash, str))
+				break ;
+			free(bash->cmd);
+			bash->cmd = NULL;
 		}
 		free(str);
 	}

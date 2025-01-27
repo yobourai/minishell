@@ -6,7 +6,7 @@
 /*   By: yobourai <yobourai@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 05:18:13 by yobourai          #+#    #+#             */
-/*   Updated: 2025/01/26 05:37:38 by yobourai         ###   ########.fr       */
+/*   Updated: 2025/01/27 00:12:54 by yobourai         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,6 @@ typedef struct s_red
 // structure for commands
 typedef struct s_cmd
 {
-	char			*cmd;
 	char			**args;
 	t_red			*in;
 	t_red			*out;
