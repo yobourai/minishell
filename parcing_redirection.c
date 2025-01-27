@@ -6,7 +6,7 @@
 /*   By: yobourai <yobourai@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 05:19:15 by yobourai          #+#    #+#             */
-/*   Updated: 2025/01/27 00:16:58 by yobourai         ###   ########.fr       */
+/*   Updated: 2025/01/27 15:01:20 by yobourai         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ t_red	*save_redirection(char *ptr, t_env *env,int *flag)
 {
 	t_red	*valeur;
 	int		size;
-
+	*flag = 0;
 	valeur = malloc(sizeof(t_red));
 	if (!valeur)
 		return (NULL);
@@ -53,7 +53,7 @@ t_red	*save_redirection(char *ptr, t_env *env,int *flag)
 	if (size == 0)
 	{
 		free(valeur);
-		*flag = 0;
+		*flag = 1;
 		return (save_redirection_hp(ptr, env));
 	}
 	valeur->value = malloc(size + 1);
@@ -64,17 +64,17 @@ t_red	*save_redirection(char *ptr, t_env *env,int *flag)
 	return (valeur);
 }
 
-void    skip_at_end(char **ptr)
+void	skip_at_end(char **ptr)
 {
         int flag;
 
         flag = 0;
-        if(**ptr == '<' && *(*ptr + 1) == '<')
+        if((**ptr == '<' && *(*ptr + 1) == '<' ) || (**ptr == '>' && *(*ptr +1) == '>'))
                 (*ptr)+=2; 
         else
                 (*ptr)++;
         skipp_space(ptr);
-        while(*ptr)
+        while(*ptr && **ptr)
         {
                 if((**ptr == '|' || **ptr == '>' || **ptr == '<' || **ptr == ' ' || **ptr =='\t') && flag == 0)
                         break;
@@ -96,44 +96,30 @@ int     redirection(t_bash *bash, char *src)
     cmd = bash->cmd;
 	cmd->next = NULL;
     while (cmd->next)
-    {
 		 cmd = cmd->next;
-	}
-	printf("ff\n");
-
     while (*src)
     {
-        help_red_add(*src,&quotes);
-        if (*src == '|' && quotes == 0)         //*src pipe
-            break ;
-        else if ((*src == '<' || *src == '>') && quotes == 0)   //*src redirection
+		if(*src == 30 || *src == 31)
+        	help_red_add(*src,&quotes);
+        if (*src == '|' && quotes == 0)
+            break;
+        else if ((*src == '<' || *src == '>') && quotes == 0)
         {
-            if (*src == '<' && ambg == 0)           //*src redirection == red_intput < input
-                in = save_redirection(src ,bash->env , &ambg);
-            else if (flag && *src == '>' && *src +1 != '>' && ambg == 0)    //*src redirection != here_document | flag if have error ambuguas of no sush file
-                out = save_redirection(src ,bash->env , &ambg);
-            else    //*src here_document    input
-            	in = save_rd(src);
-            skip_at_end(&src);
+            if (*src == '>' && ambg == 0 && *(src + 1) != '>')
+					in = save_redirection(src ,bash->env , &ambg);
+			else if ( *src == '>' && *(src + 1) == '>' && ambg == 0)
+				   in = save_redirection(src ,bash->env , &ambg);
+            else if (*src == '<' && *(src + 1) != '<' && ambg == 0)
+				   out = save_redirection(src ,bash->env , &ambg);
+            else if (flag && *src == '<' && *(src + 1) == '<' && ambg == 0)
+					in = save_rd(src);
+    	    skip_at_end(&src);
         }
         else
             src++;
 	}
-if (in)
-    cmd->in = in;
-
-if (out)
-    cmd->out = out;
-
-if (cmd->in)
-    printf("in = %s\n", cmd->in->value);
-
-if (cmd->out)
-    printf("out = %s\n", cmd->out->value);
-
 if (ambg == 1)
     flag = 0;
-
 return (flag);
 
 }

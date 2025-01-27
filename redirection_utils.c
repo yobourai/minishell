@@ -6,7 +6,7 @@
 /*   By: yobourai <yobourai@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 05:20:19 by yobourai          #+#    #+#             */
-/*   Updated: 2025/01/26 05:28:26 by yobourai         ###   ########.fr       */
+/*   Updated: 2025/01/27 07:54:10 by yobourai         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ int	is_valid_char1(char c)
 
 void	skipp_space(char **ptr)
 {
-	while (**ptr == ' ' || **ptr == '\t')
+	while (*ptr && (**ptr == ' ' || **ptr == '\t'))
 		(*ptr)++;
 }
 

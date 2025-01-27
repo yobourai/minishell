@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parcing_herdoc.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yobourai <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: yobourai <yobourai@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 05:18:51 by yobourai          #+#    #+#             */
-/*   Updated: 2025/01/26 05:18:53 by yobourai         ###   ########.fr       */
+/*   Updated: 2025/01/27 14:55:47 by yobourai         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,14 +14,14 @@
 
 int	help_red(char ptr, int *flag)
 {
-	if (ptr == '\'' && (*flag == 0 || *flag == 1))
+	if (ptr == 30 && (*flag == 0 || *flag == 1))
 	{
 		if (*flag == 0)
 			*flag = 1;
 		else if (*flag == 1)
 			*flag = 0;
 	}
-	else if (ptr == '"' && (*flag == 0 || *flag == 2))
+	else if (ptr == 31 && (*flag == 0 || *flag == 2))
 	{
 		if (*flag == 0)
 			*flag = 2;
@@ -38,20 +38,21 @@ int	size_rd(char *ptr, char *dst)
 
 	flag = 0;
 	size = 0;
-	while (*ptr == ' ' || *ptr == '\t')
-		ptr++;
+	(ptr+=2);
+	skipp_space(&ptr);
 	while (*ptr)
 	{
 		if (flag == 0 && (*ptr == '|' || *ptr == '>' || *ptr == '<'
-				|| *ptr == ' '))
+				|| *ptr == ' ' || *ptr == '\t'))
 			break ;
-		else if (*ptr != '\'' && *ptr != '"')
+		else if (*ptr != 30 && *ptr != 31 && flag == 0)
 		{
-			if (dst)
-				dst[size] = *ptr;
-			size++;
+			if(dst)
+				dst[size++] = *ptr;
+			else 
+				size++;
 		}
-		else
+		else if(*ptr == 30 || *ptr == 31)
 			help_red(*ptr, &flag);
 		ptr++;
 	}
@@ -68,14 +69,14 @@ t_red	*save_rd(char *ptr)
 	valeur = malloc(sizeof(t_red));
 	if (!valeur)
 		return (NULL);
-	size = size_rd(ptr + 2, NULL);
+	size = size_rd(ptr, NULL);
 	valeur->value = malloc(sizeof(char) * (size + 1));
 	if (!valeur->value)
 	{
 		free(valeur);
 		return (NULL);
 	}
-	size_rd(ptr + 2, valeur->value);
+	size_rd(ptr, valeur->value);
 	valeur->type = 99;
 	return (valeur);
 }
