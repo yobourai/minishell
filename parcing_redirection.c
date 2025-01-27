@@ -6,7 +6,7 @@
 /*   By: yobourai <yobourai@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 05:19:15 by yobourai          #+#    #+#             */
-/*   Updated: 2025/01/27 15:01:20 by yobourai         ###   ########.fr       */
+/*   Updated: 2025/01/27 15:24:24 by yobourai         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,7 +110,18 @@ int     redirection(t_bash *bash, char *src)
 			else if ( *src == '>' && *(src + 1) == '>' && ambg == 0)
 				   in = save_redirection(src ,bash->env , &ambg);
             else if (*src == '<' && *(src + 1) != '<' && ambg == 0)
+			{
 				   out = save_redirection(src ,bash->env , &ambg);
+				   if (out->type == 97 )
+					{		
+						if(access(out->value,F_OK) == -1)
+						{	
+							flag = 0;
+							printf("%s: No such file or directory \n",out->value);
+							return flag;
+						}
+					}			
+			}
             else if (flag && *src == '<' && *(src + 1) == '<' && ambg == 0)
 					in = save_rd(src);
     	    skip_at_end(&src);
@@ -118,6 +129,7 @@ int     redirection(t_bash *bash, char *src)
         else
             src++;
 	}
+	
 if (ambg == 1)
     flag = 0;
 return (flag);
