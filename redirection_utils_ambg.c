@@ -14,15 +14,6 @@
 
 int	handle_ambg(char *ptr)
 {
-	int	flag;
-	int	fambg;
-	int	i;
-	int	size;
-
-	size = 0;
-	flag = 0;
-	fambg = 0;
-	i = 0;
 	skipp_space(&ptr);
 	while (*ptr != '\0')
 	{

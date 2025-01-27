@@ -128,11 +128,9 @@ char	*cpy_value(char **ptr, t_env *env, char *dest)
 {
 	int		flag;
 	char	*str;
-	int		j;
 	int		size;
 
 	str = *ptr;
-	j = 0;
 	flag = 0;
 	size = size_st(str, env);
 	skipp_space(&str);

@@ -108,7 +108,9 @@ char				*cpy_value(char **ptr, t_env *env, char *dest);
 // parcing_redirection.c
 // save redirection and checking all shit
 t_red				*save_redirection_hp(char *ptr, t_env *env);
-t_red				*save_redirection(char *ptr, t_env *env);
+t_red	*save_redirection(char *ptr, t_env *env,int *flag);
+int     redirection(t_bash *bash, char *src);
+void    skip_at_end(char **ptr);
 
 // environment.c	//done
 void				free_env(t_env *env);
