@@ -6,7 +6,7 @@
 /*   By: yobourai <yobourai@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 05:18:13 by yobourai          #+#    #+#             */
-/*   Updated: 2025/01/27 09:27:38 by yobourai         ###   ########.fr       */
+/*   Updated: 2025/01/27 17:18:29 by yobourai         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,6 +111,7 @@ t_red				*save_redirection_hp(char *ptr, t_env *env);
 t_red	*save_redirection(char *ptr, t_env *env,int *flag);
 int     redirection(t_bash *bash, char *src);
 void    skip_at_end(char **ptr);
+t_cmd    **save_cmd(t_bash *bash, char *src);
 
 // environment.c	//done
 void				free_env(t_env *env);

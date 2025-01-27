@@ -6,7 +6,7 @@
 /*   By: yobourai <yobourai@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 05:19:15 by yobourai          #+#    #+#             */
-/*   Updated: 2025/01/27 15:24:24 by yobourai         ###   ########.fr       */
+/*   Updated: 2025/01/27 17:19:40 by yobourai         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,4 +134,27 @@ if (ambg == 1)
     flag = 0;
 return (flag);
 
+}
+t_cmd    **save_cmd(t_bash *bash, char *src)
+{
+	int quotes;
+	quotes = 0;
+	t_cmd *cmd;
+	   cmd = bash->cmd;
+	cmd->next = NULL;
+    while (cmd->next)
+		 cmd = cmd->next;
+	while(*src)
+	{
+		if(*src == 30 || *src == 31)
+			help_red_add(*src , &quotes);
+		if(*src == '|' && quotes == 0)
+				break;
+		if((*src == '<' || *src == '>') && quotes == 0)
+			skip_at_end(&src);
+		else
+			cmd->args = *src;
+		src++;	
+	}
+	return cmd->args;	
 }
