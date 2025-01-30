@@ -61,7 +61,7 @@ int	size_rd(char *ptr, char *dst)
 	return (size);
 }
 
-t_red	*save_rd(char *ptr)
+t_red	*save_rd(t_cmd*cmd ,char *ptr)
 {
 	int		size;
 	t_red	*valeur;
@@ -78,5 +78,7 @@ t_red	*save_rd(char *ptr)
 	}
 	size_rd(ptr, valeur->value);
 	valeur->type = 99;
-	return (valeur);
+	size = 1;
+	file_addback(cmd ,valeur, size);
+return (valeur);
 }

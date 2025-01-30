@@ -67,14 +67,18 @@ int					handel_redirection(t_bash *bash, char *ptr);
 
 // read_line.c
 // read line from user
+void free_all(t_bash *bash);
+void free_cmd(t_cmd *cmd);
+void	free_files(t_red *file);
+void	free_arry(char **ptr);
+t_cmd	 *alloc_command();
 void				inpute(t_bash *bash);
 void				handle_error(char *data, char *message);
 
 // parcing_herdoc.c
 int					help_red(char ptr, int *flag);
 int					size_rd(char *ptr, char *dst);
-t_red				*save_rd(char *ptr);
-
+t_red	*save_rd(t_cmd*cmd ,char *ptr);
 //  redirection_utils.c
 // typ of redirection
 void				set_typ(char **ptr, int *type);
@@ -107,12 +111,14 @@ char				*cpy_value(char **ptr, t_env *env, char *dest);
 
 // parcing_redirection.c
 // save redirection and checking all shit
-t_red				*save_redirection_hp(char *ptr, t_env *env);
-t_red	*save_redirection(char *ptr, t_env *env,int *flag);
-int     redirection(t_bash *bash, char *src);
+t_red	*save_redirection_hp(char *ptr, t_env *env, t_cmd *cmd, t_red *value);
+t_red	*save_redirection(char *ptr, t_env *env, int *flag , t_cmd *cmd);
+int     get_command_info(t_bash *bash, char *src);
 void    skip_at_end(char **ptr);
-t_cmd    **save_cmd(t_bash *bash, char *src);
-
+int  redirection(t_bash *bash, char **str, int *flag, int *quotes);
+t_cmd    *cmd_new(t_cmd *head);
+int count_arg(char **src, int *quotes);
+void    file_addback(t_cmd *cmd, t_red *new, int in_out);
 // environment.c	//done
 void				free_env(t_env *env);
 t_env				*get_env(char *env);

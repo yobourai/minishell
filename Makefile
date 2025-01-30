@@ -10,8 +10,8 @@ SRC_FILE = $(wildcard $(SRC_DIR)*.c)
 # Compiler and Flags
 CC = cc
 INCLUDE = -I$(SRC_DIR) -I$(LIBFT_DIR)
-CFLAGS = -Wall -Wextra -Werror $(INCLUDE) $(FSANITIZE)
-FSANITIZE = -fsanitize=address -g
+CFLAGS =  $(INCLUDE) $(FSANITIZE)
+FSANITIZE = -Wall -Wextra -Werror #-fsanitize=address -g
 LIBFT = $(LIBFT_DIR)libft.a
 
 # Targets
