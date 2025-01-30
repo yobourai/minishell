@@ -19,7 +19,6 @@ void	save_redirection_hp(char *ptr, t_cmd *cmd, t_red *valeur)
 	size = handle_ambg(ptr);
 	if (size != 0)
 	{
-		printf("debug %d\n", cpy_ambg_size(ptr));
 		valeur->value = malloc(sizeof(char) * (1 + cpy_ambg_size(ptr)));
 		cpy_ambg(ptr, valeur->value);
 		if (!valeur->value)
@@ -55,14 +54,12 @@ void    file_addback(t_cmd *cmd, t_red *new, int in_out)
         head = cmd->in;
         if (!head)
         {
-            printf("ff\n");
             cmd->in = new;
             return ;
         }
     }
     else
     {
-        printf("ss\n");
         head = cmd->out;
         if (!head)
         {
@@ -189,10 +186,7 @@ int  redirection(t_bash *bash, char **str, int *flag, int *quotes)
 	        size += count_arg(&ptr, quotes);
     }
     if (!size)
-	{
-		printf("lay \n");
         *str = ptr;
-	}
     return (size);
 }
 
@@ -220,18 +214,18 @@ void    print(t_cmd *cmd)
 
 	while (cmd)
 	{
-		printf("input****\n");
 		tmp = cmd->in;
 		while (tmp)
 		{
+		    printf("input****\n");
 			printf("in =>name = %s|", tmp->value);
 			printf(" type = %d|\n", tmp->type);
 			tmp = tmp->next;
 		}
-		printf("output****\n");
 		tmp = cmd->out;
 		while (tmp)
 		{
+		    printf("output****\n");
 			printf("output =>name = %s|", tmp->value);
 			printf(" type = %d|\n", tmp->type);
 			tmp = tmp->next;
@@ -245,13 +239,13 @@ int get_command_info(t_bash *bash, char *src)
     t_cmd *cmd;
     int flag = 0;
     int quotes = 0;
-    int size;
+    int size ;
 
     cmd = bash->cmd;
     while (*src)
     {
-        size = redirection(bash, &src, &flag, &quotes);
-        printf("**size = %d\n", size);
+        size =redirection(bash, &src, &flag, &quotes);
+        printf("**size == %d\n", size);
         // if (size)
         // {
            // save arguments
@@ -263,6 +257,7 @@ int get_command_info(t_bash *bash, char *src)
         }
     }
 	cmd = bash->cmd;
-    print(cmd);
+    if(cmd)
+        print(cmd);
     return flag;
 }
