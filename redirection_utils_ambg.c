@@ -61,31 +61,34 @@ int	condition(char **ptr, int *flag)
 	return (0);
 }
 
-char	*cpy_ambg(char *ptr)
+void	cpy_ambg(char *ptr, char *dst)
 {
-	char	*tmp;
 	int		flag;
 	int		size;
+	int		tootal;
 	int		i;
 
-	size = cpy_ambg_size(ptr);
-	flag = 0;
 	i = 0;
-	tmp = malloc(size + 1);
-	if (!tmp)
-		return (NULL);
-	size = -1;
+	size = 0;
+	tootal = cpy_ambg_size(ptr);
 	skipp_space(&ptr);
 	while (ptr[i] != '\0')
 	{
 		if (ptr[i] == 30 || ptr[i] == 31)
-			help_red_add(*ptr, &flag);
-		if (condition(&ptr, &flag) == 1)
+			help_red_add(*ptr,  &flag);
+		if ((*ptr == '|' || *ptr == '>' || *ptr == '<' || *ptr == ' ')
+			&& flag == 0)
 			break ;
 		else
-			tmp[++size] = ptr[i];
+		{
+			printf("size = %d\n", size);
+			dst[size] = ptr[i];
+			size++;
+			if (tootal == size)
+				break ;
+		}
 		i++;
 	}
-	tmp[size + 1] = 0;
-	return (tmp);
+	dst[size] = 0;
+	printf("dd = %s\n", dst);
 }

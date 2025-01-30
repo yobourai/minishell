@@ -45,7 +45,7 @@ int	size_rd(char *ptr, char *dst)
 		if (flag == 0 && (*ptr == '|' || *ptr == '>' || *ptr == '<'
 				|| *ptr == ' ' || *ptr == '\t'))
 			break ;
-		else if (*ptr != 30 && *ptr != 31 && flag == 0)
+		else if (*ptr != 30 && *ptr != 31)
 		{
 			if(dst)
 				dst[size++] = *ptr;
@@ -65,10 +65,10 @@ t_red	*save_rd(t_cmd*cmd ,char *ptr)
 {
 	int		size;
 	t_red	*valeur;
-
 	valeur = malloc(sizeof(t_red));
 	if (!valeur)
 		return (NULL);
+	valeur->next =NULL;
 	size = size_rd(ptr, NULL);
 	valeur->value = malloc(sizeof(char) * (size + 1));
 	if (!valeur->value)
@@ -80,5 +80,5 @@ t_red	*save_rd(t_cmd*cmd ,char *ptr)
 	valeur->type = 99;
 	size = 1;
 	file_addback(cmd ,valeur, size);
-return (valeur);
+	return (valeur);
 }

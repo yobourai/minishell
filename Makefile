@@ -11,7 +11,7 @@ SRC_FILE = $(wildcard $(SRC_DIR)*.c)
 CC = cc
 INCLUDE = -I$(SRC_DIR) -I$(LIBFT_DIR)
 CFLAGS =  $(INCLUDE) $(FSANITIZE)
-FSANITIZE = -Wall -Wextra -Werror #-fsanitize=address -g
+FSANITIZE = -Wall -Wextra -Werror -fsanitize=address -g
 LIBFT = $(LIBFT_DIR)libft.a
 
 # Targets

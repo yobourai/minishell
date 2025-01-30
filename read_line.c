@@ -85,7 +85,6 @@ void	handle_error(char *data, char *message)
 void	inpute(t_bash *bash)
 {
 	char	*str;
-	// int		exit_status;
 
 	while (1)
 	{
@@ -93,8 +92,7 @@ void	inpute(t_bash *bash)
 		if (!str)
 		{
 			free_all(bash);
-			printf("signle controle +D\n");
-			exit(1);
+			exit(7);
 		}
 		add_history(str);
 		if (handle_quotes(bash, str) == 0)
@@ -104,7 +102,7 @@ void	inpute(t_bash *bash)
 			{
 				free(str);
 				free_all(bash);
-				exit(1);
+				exit(7);
 			}
 			if (!get_command_info(bash, str))
 			{

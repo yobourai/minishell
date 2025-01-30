@@ -13,9 +13,9 @@
 #ifndef MINISHELL_H
 # define MINISHELL_H
 # include "./libft/libft.h"
+# include <stdio.h>
 # include <readline/history.h>
 # include <readline/readline.h>
-# include <stdio.h>
 # include <stdlib.h>
 # include <string.h>
 # include <unistd.h>
@@ -97,7 +97,7 @@ void				skipp_space(char **ptr);
 int					condition(char **ptr, int *flag);
 int					handle_ambg(char *ptr);
 int					cpy_ambg_size(char *ptr);
-char				*cpy_ambg(char *ptr);
+void	cpy_ambg(char *ptr, char *dst);
 
 // redirection_utils2.c
 // size
@@ -111,7 +111,7 @@ char				*cpy_value(char **ptr, t_env *env, char *dest);
 
 // parcing_redirection.c
 // save redirection and checking all shit
-t_red	*save_redirection_hp(char *ptr, t_env *env, t_cmd *cmd, t_red *value);
+void	save_redirection_hp(char *ptr, t_cmd *cmd, t_red *value);
 t_red	*save_redirection(char *ptr, t_env *env, int *flag , t_cmd *cmd);
 int     get_command_info(t_bash *bash, char *src);
 void    skip_at_end(char **ptr);
