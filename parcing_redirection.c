@@ -107,10 +107,10 @@ t_red	*save_redirection(char *ptr, t_env *env, int *flag , t_cmd *cmd)
 void	skip_at_end(char **ptr)
 {
         int flag;
-
+        printf("qq ==%s\n",*ptr);
         flag = 0;
         if((**ptr == '<' && *(*ptr + 1) == '<' ) || (**ptr == '>' && *(*ptr +1) == '>'))
-            (*ptr)+=2; 
+            (*ptr)+=2;
         else
             (*ptr)++;
         skipp_space(ptr);
@@ -122,6 +122,8 @@ void	skip_at_end(char **ptr)
                 (*ptr)++;
         }
         skipp_space(ptr);
+        printf("bb ==%s\n",*ptr);
+
 }
 int count_arg(char **src, int *quotes)
 {
@@ -158,7 +160,7 @@ int  redirection(t_bash *bash, char **str, int *flag, int *quotes)
     in = NULL;
     size = 0;
     ptr = *str;
-    while (*ptr)
+    while ( ptr && *ptr)
     {
         if (*ptr == '|' && *quotes == 0)
             break;
@@ -183,7 +185,7 @@ int  redirection(t_bash *bash, char **str, int *flag, int *quotes)
             skip_at_end(&ptr);
         }
 		else
-	        size += count_arg(&ptr, quotes);
+            size += count_arg(&ptr, quotes);
     }
     if (!size)
         *str = ptr;
@@ -230,8 +232,38 @@ void    print(t_cmd *cmd)
 			printf(" type = %d|\n", tmp->type);
 			tmp = tmp->next;
 		}
+        int i = 0;
+        while (cmd->args && cmd->args[i])
+        {
+            printf("arg[%d] = %s\n", i, cmd->args[i]);
+            i++;
+        }
 		cmd = cmd->next;
 	}
+}
+
+void add_argument_to_cmd(t_cmd *cmd, char **arg , int len , t_env *env)
+{
+    cmd->args = malloc(sizeof(char *) * (len + 1));
+    if (!cmd->args)
+        return;
+    int i ;
+    int quotes;
+    i = 0;
+    
+    while(i < len)
+    {
+        help_red_add(**arg , &quotes);
+        if((**arg == '<' || **arg == '>' ) && quotes == 0)
+            skip_at_end(arg);
+        if(**arg == '|' && quotes == 0)
+                break;
+        cmd->args[i] = malloc(size_st(*arg , env) + 1); 
+        cpy_value(arg,env,cmd->args[i]);
+        i++;
+    }
+    cmd->args[i] = NULL;
+
 }
 
 int get_command_info(t_bash *bash, char *src)
@@ -244,19 +276,22 @@ int get_command_info(t_bash *bash, char *src)
     cmd = bash->cmd;
     while (*src)
     {
-        size =redirection(bash, &src, &flag, &quotes);
-        printf("**size == %d\n", size);
-        // if (size)
-        // {
-           // save arguments
-        // }
-        if (*src)
+        // printf("src==>%s\n",src);
+        size = redirection(bash, &src, &flag, &quotes);
+            // print(cmd);
+            // printf("****size=%d\n",size);
+        if(size)
+        {
+            add_argument_to_cmd(bash->cmd , &src ,size ,bash->env);
+
+        }
+        if(*src)
         {
             cmd = cmd_new(bash->cmd);
             src++;
         }
     }
-	cmd = bash->cmd;
+    cmd = bash->cmd;
     if(cmd)
         print(cmd);
     return flag;
